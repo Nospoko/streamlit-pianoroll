@@ -9,10 +9,12 @@ class PianoRoll {
   noteHeight: number | null;
   backgroundColormap: any;
   colormap: any;
+  timeIndicator: SVGLineElement | null;
 
   constructor(svgElement: SVGSVGElement, sequence: NoteSequence) {
     this.svgElement = svgElement;
     this.noteHeight = null;
+    this.timeIndicator = null;
     this.start = 0;
     this.end = 1;
 
@@ -47,16 +49,32 @@ class PianoRoll {
     this.drawEmptyPianoRoll(pitchMin, pitchMax);
 
     this.drawNotes(sequence, pitchMin, pitchMax);
+
+    // Time indicator
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', '0');
+    line.setAttribute('y1', '0');
+    line.setAttribute('x2', '0');
+    line.setAttribute('y2', '1');
+    line.setAttribute('stroke', '#E8A03E');
+    line.setAttribute('stroke-width', '0.002');
+    this.timeIndicator = line;
+    this.svgElement.appendChild(this.timeIndicator);
+  }
+
+  public redrawWithNewTime(currentTime: number): void {
+    // Transform time to x coordinate
+    const new_x = this.timeToX(currentTime);
+
+    // Move the time bar
+    if (this.timeIndicator) {
+      this.timeIndicator.setAttribute('x1', `${new_x}`);
+      this.timeIndicator.setAttribute('x2', `${new_x}`);
+    }
   }
 
   private timeToX(time: number): number {
     return time / this.end;
-  }
-
-  // You should also define types for any methods of the class.
-  _drawPianoRoll(sequence: NoteSequence): void {
-    // Implementation here
-    this.drawEmptyPianoRoll(40, 69);
   }
 
   public drawEmptyPianoRoll(pitchMin: number, pitchMax: number): void {

@@ -40,7 +40,8 @@ export function onStreamlitRender(event: Event): void {
   pianorollSvgVisualizer.reload = () => {};
   pianorollSvgVisualizer.clearActiveNotes = () => {};
   pianorollSvgVisualizer.redraw = (noteDetails) => {
-    console.log(noteDetails);
+    const currentTime = noteDetails.startTime;
+    pianoRoll.redrawWithNewTime(currentTime);
   }
   player.addVisualizer(pianorollSvgVisualizer);
 }
