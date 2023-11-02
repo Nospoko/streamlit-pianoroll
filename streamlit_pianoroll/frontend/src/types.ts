@@ -1,6 +1,6 @@
 export interface MidiPlayerElement extends HTMLElement {
   noteSequence?: NoteSequence;
-  addVisualizer(visualizer: MidiVisualizerElement): void;
+  addVisualizer(visualizer: PianoRollSvgVisualizer): void;
 }
 
 export interface MidiVisualizerElement extends HTMLElement {
@@ -13,6 +13,8 @@ export interface PianoRollSvgVisualizer extends SVGSVGElement {
   play(): void;
   pause(): void;
   reload(): void;
+  clearActiveNotes(): void;
+  redraw(noteDetails: any): void;
 }
 
 export interface MidiData {

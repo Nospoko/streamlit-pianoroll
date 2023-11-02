@@ -1,7 +1,7 @@
 import { Streamlit, RenderData } from "streamlit-component-lib"
 
 import PianoRoll from "./pianoroll"
-import { MidiPlayerElement, MidiVisualizerElement } from "./types"
+import { MidiPlayerElement } from "./types"
 import { enhancePianoRollSvg } from './enhanceVisualizer';
 
 
@@ -26,14 +26,21 @@ export function onStreamlitRender(event: Event): void {
   let midi_data = data.args["midi_data"];
   const note_sequence = midi_data.notes;
   const player = document.getElementById("my-midi-player")! as MidiPlayerElement;
+
+  // *noteSequence* in the player is a more complex structure than a sequence of notes
   player.noteSequence = midi_data;
 
   // TODO: better typing, try to avoid "as unknown"
-  const visualizer = document.getElementById("my-visualizer")! as MidiVisualizerElement;
-  player.addVisualizer(visualizer);
-  visualizer.noteSequence = midi_data;
-
   const pianorollSvg = document.getElementById("my-svg")! as unknown as SVGSVGElement;
+  pianorollSvg.innerHTML = "";
+
   const pianorollSvgVisualizer = enhancePianoRollSvg(pianorollSvg);
   const pianoRoll = new PianoRoll(pianorollSvgVisualizer, note_sequence);
+
+  pianorollSvgVisualizer.reload = () => {};
+  pianorollSvgVisualizer.clearActiveNotes = () => {};
+  pianorollSvgVisualizer.redraw = (noteDetails) => {
+    console.log(noteDetails);
+  }
+  player.addVisualizer(pianorollSvgVisualizer);
 }

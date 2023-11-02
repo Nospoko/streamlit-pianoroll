@@ -12,13 +12,15 @@ st.subheader("Component with Piano Rolls!")
 
 def make_some_notes(first_note: int, step: int):
     notes = []
-    for it in range(20):
-        end_time = it * 0.25 + 0.1
+    for it in range(80):
+        start_time = it * 0.25 + 0.1 * np.random.random()
+        end_time = start_time + 0.1
+        pitch = first_note + 20 * np.sin(2 * np.pi * it / 80) + np.random.choice([-1, 0, 1])
         note = {
-            "pitch": int(first_note + it * step),
-            "startTime": it * 0.25,
+            "pitch": int(pitch),
+            "startTime": start_time,
             "endTime": end_time,
-            "velocity": 60 + 3 * it,
+            "velocity": 60 + np.random.randint(40),
         }
         notes.append(note)
 
@@ -36,5 +38,3 @@ for jt in range(3):
         step=np.random.choice([-1, 1]),
     )
     num_clicks = pianoroll(midi_data=midi_data, key=jt)
-
-st.markdown("You've clicked %s times!" % int(num_clicks))
