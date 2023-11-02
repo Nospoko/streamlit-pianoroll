@@ -10,7 +10,7 @@ setuptools.setup(
     version="0.0.1",
     author="John Smith",
     author_email="tomasz@pianoroll.io",
-    description="Streamlit component that allows you to do X",
+    description="Streamlit component that allows you to play piano",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="",

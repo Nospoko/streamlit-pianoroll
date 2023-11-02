@@ -24,11 +24,6 @@ function drawCircleOnSVG(svg: SVGSVGElement): void {
 }
 
 export function afterContentLoaded() {
-  // Add text and a button to the DOM. (You could also add these directly
-  // to index.html.)
-  const button = document.getElementById("my-button")!;
-  // button.textContent = "Click Me NOW!"
-
   const player = document.getElementById("my-midi-player")! as MidiPlayerElement;
 
   player.addEventListener('start', () => {
@@ -40,33 +35,11 @@ export function afterContentLoaded() {
     console.log("LOAD EVENT!");
     Streamlit.setFrameHeight()
   }, false);
-
-  // Add a click handler to our button. It will send data back to Streamlit.
-  let numClicks = 0
-
-  button.onclick = function(): void {
-    // Increment numClicks, and pass the new value back to
-    // Streamlit via `Streamlit.setComponentValue`.
-    numClicks += 1
-    Streamlit.setComponentValue(numClicks)
-
-    const svg = document.getElementById("mySvg");
-    if (svg && svg instanceof SVGSVGElement) {
-      drawCircleOnSVG(svg);
-    }
-  }
 }
 
 export function onStreamlitRender(event: Event): void {
   // Get the RenderData from the event
   const data = (event as CustomEvent<RenderData>).detail
-
-  // Maintain compatibility with older versions of Streamlit that don't send
-  // a theme object.
-  const button = document.getElementById("my-button")! as HTMLButtonElement;
-
-  // Disable our button if necessary.
-  button.disabled = data.disabled
 
   // RenderData.args is the JSON dictionary of arguments sent from the
   // Python script.
