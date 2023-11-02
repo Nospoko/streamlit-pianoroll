@@ -31,10 +31,10 @@ def make_some_notes(first_note: int, step: int):
 
 for jt in range(3):
     st.markdown(f"### Another one {jt}")
-    note_sequence = make_some_notes(
+    midi_data = make_some_notes(
         first_note=50 + np.random.randint(20),
         step=np.random.choice([-1, 1]),
     )
-    num_clicks = pianoroll(note_sequence=note_sequence, key=jt)
+    num_clicks = pianoroll(midi_data=midi_data, key=jt)
 
 st.markdown("You've clicked %s times!" % int(num_clicks))

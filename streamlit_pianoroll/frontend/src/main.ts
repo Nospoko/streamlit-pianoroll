@@ -23,14 +23,15 @@ export function onStreamlitRender(event: Event): void {
   // Get the RenderData from the event
   const data = (event as CustomEvent<RenderData>).detail
 
-  let note_sequence = data.args["note_sequence"]
+  let midi_data = data.args["midi_data"];
+  const note_sequence = midi_data.notes;
   const player = document.getElementById("my-midi-player")! as MidiPlayerElement;
-  player.noteSequence = note_sequence;
+  player.noteSequence = midi_data;
 
   // TODO: better typing, try to avoid "as unknown"
   const visualizer = document.getElementById("my-visualizer")! as MidiVisualizerElement;
   player.addVisualizer(visualizer);
-  visualizer.noteSequence = note_sequence;
+  visualizer.noteSequence = midi_data;
 
   const pianorollSvg = document.getElementById("my-svg")! as unknown as SVGSVGElement;
   const pianorollSvgVisualizer = enhancePianoRollSvg(pianorollSvg);

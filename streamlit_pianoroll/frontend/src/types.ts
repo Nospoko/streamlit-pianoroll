@@ -1,8 +1,3 @@
-export type NoteSequence = {
-  // TODO Make it consistent with reality
-  notes: Array<{ pitch: number; duration: number; }>;
-};
-
 export interface MidiPlayerElement extends HTMLElement {
   noteSequence?: NoteSequence;
   addVisualizer(visualizer: MidiVisualizerElement): void;
@@ -19,3 +14,17 @@ export interface PianoRollSvgVisualizer extends SVGSVGElement {
   pause(): void;
   reload(): void;
 }
+
+export interface MidiData {
+  noteSequence: NoteSequence;
+  length: number;
+}
+
+export interface Note {
+  startTime: number;
+  endTime: number;
+  pitch: number;
+  velocity: number;
+}
+
+export type NoteSequence = Note[];
