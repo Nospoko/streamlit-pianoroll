@@ -1,4 +1,4 @@
-import { Note, NoteSequence } from "./types"
+import { Note, NoteSequence, NoteRectangleInfo } from "./types"
 import { DEVON_R } from "./colors"
 
 
@@ -6,14 +6,17 @@ class PianoRoll {
   svgElement: SVGSVGElement;
   end: number;
   start: number;
-  noteHeight: number | null;
+  pitchMin!: number
+  pitchMax!: number
+  pitchSpan!: number
+  noteHeight!: number;
   backgroundColormap: any;
   colormap: any;
+  displayedNotes!: NoteRectangleInfo[];
   timeIndicator: SVGLineElement | null;
 
   constructor(svgElement: SVGSVGElement, sequence: NoteSequence) {
     this.svgElement = svgElement;
-    this.noteHeight = null;
     this.timeIndicator = null;
     this.start = 0;
     this.end = 1;
@@ -31,24 +34,24 @@ class PianoRoll {
 
     const pitches = sequence.map(note => note.pitch);
 
-    let pitchMin = Math.min(...pitches);
-    let pitchMax = Math.max(...pitches);
-    let pitchSpan = pitchMax - pitchMin;
+    this.pitchMin = Math.min(...pitches);
+    this.pitchMax = Math.max(...pitches);
+    this.pitchSpan = this.pitchMax - this.pitchMin;
 
-    if (pitchSpan < 24) {
-      const diff = 24 - pitchSpan;
-      pitchMin -= Math.ceil(diff / 2);
-      pitchMax += Math.floor(diff / 2);
+    if (this.pitchSpan < 24) {
+      const diff = 24 - this.pitchSpan;
+      this.pitchMin -= Math.ceil(diff / 2);
+      this.pitchMax += Math.floor(diff / 2);
     }
 
-    pitchMin -= 3;
-    pitchMax += 3;
-    pitchSpan = pitchMax - pitchMin;
-    this.noteHeight = 1 / pitchSpan;
+    this.pitchMin -= 3;
+    this.pitchMax += 3;
+    this.pitchSpan = this.pitchMax - this.pitchMin;
+    this.noteHeight = 1 / this.pitchSpan;
 
-    this.drawEmptyPianoRoll(pitchMin, pitchMax);
+    this.drawEmptyPianoRoll(this.pitchMin, this.pitchMax);
 
-    this.drawNotes(sequence, pitchMin, pitchMax);
+    this.drawNotes(sequence);
 
     // Time indicator
     const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
@@ -71,6 +74,35 @@ class PianoRoll {
       this.timeIndicator.setAttribute('x1', `${new_x}`);
       this.timeIndicator.setAttribute('x2', `${new_x}`);
     }
+
+    // To make the rectangle grow symmetrically, we have
+    // to move it half of the growth in the other direction
+    const height_gain = this.noteHeight * 0.8
+    const new_height = this.noteHeight + height_gain;
+
+    // Change colors for playing notes
+    this.displayedNotes.forEach(note => {
+      if (note.x_left <= new_x && note.x_right > new_x) {
+        // This class controls the transition rate (see note-noteRectangle.active css)
+        note.noteRectangle.classList.add('active');
+
+        // Special color for active notes
+        note.noteRectangle.setAttribute('fill', '#5DB5D5');
+
+        // Make it dance
+        const new_y = note.y - height_gain / 2;
+        note.noteRectangle.setAttribute('y', `${new_y}`);
+        note.noteRectangle.setAttribute('height', `${new_height}`);
+      }
+      else if (note.x_right < new_x) {
+        note.noteRectangle.classList.remove('active');
+
+        // Bring back to default look
+        note.noteRectangle.setAttribute('fill', note.velocity_color);
+        note.noteRectangle.setAttribute('height', `${note.height}`);
+        note.noteRectangle.setAttribute('y', `${note.y}`);
+      }
+    });
   }
 
   private timeToX(time: number): number {
@@ -93,18 +125,22 @@ class PianoRoll {
     }
   }
 
-  private drawNotes(sequence: NoteSequence, pitchMin: number, pitchMax: number): void {
+  private drawNotes(sequence: NoteSequence): void {
+    this.displayedNotes = []
     sequence.forEach((note: Note) => {
-      const noteRectangle = this.createNoteRectangle(note, pitchMin, pitchMax);
-      this.svgElement.appendChild(noteRectangle);
+      const noteRectangleInfo = this.createNoteRectangle(note);
+      this.svgElement.appendChild(noteRectangleInfo.noteRectangle);
+      this.displayedNotes.push(noteRectangleInfo);
     });
   }
 
-  private createNoteRectangle(note: Note, pitchMin: number, pitchMax: number): SVGRectElement {
+  private createNoteRectangle(
+    note: Note,
+  ): NoteRectangleInfo {
     const noteRectangle = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
     const x = this.timeToX(note.startTime - (this.start || 0));
     const w = this.timeToX(note.endTime - note.startTime);
-    const y = 1 - (note.pitch - pitchMin) / (pitchMax - pitchMin);
+    const y = 1 - (note.pitch - this.pitchMin) / (this.pitchMax - this.pitchMin);
     const color = this.colormap[note.velocity];
 
     noteRectangle.setAttribute('x', `${x}`);
@@ -114,7 +150,18 @@ class PianoRoll {
     noteRectangle.setAttribute('fill', color);
     noteRectangle.classList.add('note-rectangle');
 
-    return noteRectangle;
+    // Store it
+    let trackedNote = {
+      noteRectangle: noteRectangle,
+      velocity_color: color,
+      y: y,
+      x_left: x,
+      x_right: x + w,
+      width: w,
+      height: this.noteHeight,
+    };
+
+    return trackedNote;
   }
 
   private drawBlackKeyBackground(y: number, height: number): void {

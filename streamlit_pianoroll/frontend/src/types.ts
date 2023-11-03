@@ -30,3 +30,12 @@ export interface Note {
 }
 
 export type NoteSequence = Note[];
+
+export interface NoteRectangleInfo {
+  noteRectangle: SVGRectElement;
+  y: number;
+  velocity_color: string;
+  height: number;
+  x_left: number;
+  x_right: number;
+}

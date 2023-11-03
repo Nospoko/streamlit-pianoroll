@@ -1,4 +1,4 @@
 .pianoroll-border {
-    border: 8px solid tomato;
-    padding: 10px;
+    border: 3px solid black;
+    padding: 0px !important;
 }
