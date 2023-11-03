@@ -129,6 +129,7 @@ class PianoRoll {
     this.displayedNotes = []
     sequence.forEach((note: Note) => {
       const noteRectangleInfo = this.createNoteRectangle(note);
+
       this.svgElement.appendChild(noteRectangleInfo.noteRectangle);
       this.displayedNotes.push(noteRectangleInfo);
     });

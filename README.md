@@ -20,7 +20,6 @@ st.write("This is a pianoroll!")
 pianoroll()
 ```
 
-
 ## Development instructions
 
 * Initialize and run the component template frontend:
@@ -57,4 +56,15 @@ To run the hooks against all files without running `git commit`:
 
 ```sh
 pre-commit run --all-files
+```
+
+
+### Publishing
+
+[Tutorial](https://docs.streamlit.io/library/components/publish)
+
+
+```
+python setup.py sdist bdist_wheel
+python -m twine upload --repository pypi dist/*
 ```
