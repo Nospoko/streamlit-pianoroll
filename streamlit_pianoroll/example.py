@@ -1,7 +1,7 @@
 import numpy as np
 import streamlit as st
 
-from streamlit_pianoroll import pianoroll
+from streamlit_pianoroll import pianoroll_player
 
 # Add some test code to play with the component while it's in development.
 # During development, we can run this just as we would any other Streamlit
@@ -37,4 +37,4 @@ for jt in range(3):
         first_note=50 + np.random.randint(20),
         step=np.random.choice([-1, 1]),
     )
-    num_clicks = pianoroll(midi_data=midi_data, key=jt)
+    num_clicks = pianoroll_player(midi_data=midi_data, key=jt)

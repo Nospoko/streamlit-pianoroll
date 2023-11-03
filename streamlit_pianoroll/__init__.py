@@ -1,12 +1,13 @@
 import os
 
+from fortepyan import MidiPiece
 import streamlit.components.v1 as components
 
 # Create a _RELEASE constant. We'll set this to False while we're developing
 # the component, and True when we're ready to package and distribute it.
 # (This is, of course, optional - there are innumerable ways to manage your
 # release process.)
-_RELEASE = True
+_RELEASE = False
 
 # Declare a Streamlit component. `declare_component` returns a function
 # that is used to create instances of the component. We're naming this
@@ -44,14 +45,13 @@ else:
 # `declare_component` and call it done. The wrapper allows us to customize
 # our component's API: we can pre-process its input args, post-process its
 # output value, and add a docstring for users.
-def pianoroll(midi_data: dict, key=None):
+def pianoroll_player(midi_data: dict, key=None):
     """Create a new instance of "pianoroll".
 
     Parameters
     ----------
-    name: str
-        The name of the thing we're saying hello to. The component will display
-        the text "Hello, {name}!"
+    midi_data: dict
+        MIDI notes in a format that the html player will accept
     key: str or None
         An optional key that uniquely identifies this component. If this is
         None, and the component's arguments are changed, the component will
@@ -59,10 +59,6 @@ def pianoroll(midi_data: dict, key=None):
 
     Returns
     -------
-    int
-        The number of times the component's "Click Me" button has been clicked.
-        (This is the value passed to `Streamlit.setComponentValue` on the
-        frontend.)
 
     """
     # Call through to our private component function. Arguments we pass here
@@ -79,4 +75,23 @@ def pianoroll(midi_data: dict, key=None):
 
     # We could modify the value returned from the component if we wanted.
     # There's no need to do this in our simple example - but it's an option.
+    return component_value
+
+
+def from_fortepyan(piece: MidiPiece, key=None):
+    df = piece.df.copy()
+
+    column_mapping = {
+        "start": "startTime",
+        "end": "endTime",
+    }
+    df = df.rename(columns=column_mapping)
+
+    notes = df.to_dict(orient="records")
+    midi_data = {
+        "notes": notes,
+        "totalTime": df.endTime.max(),
+    }
+
+    component_value = pianoroll_player(midi_data=midi_data, key=key)
     return component_value

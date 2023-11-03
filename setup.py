@@ -7,8 +7,8 @@ long_description = (this_directory / "README.md").read_text()
 
 setuptools.setup(
     name="streamlit-pianoroll",
-    version="0.1.1",
-    author="John Smith",
+    version="0.1.3",
+    author="Bathilda Bagshot",
     author_email="tomasz@pianoroll.io",
     description="Streamlit component that allows you to play piano",
     long_description=long_description,
@@ -23,6 +23,7 @@ setuptools.setup(
         # If your component has other Python dependencies, list
         # them here.
         "streamlit >= 0.63",
+        "fortepyan",
     ],
     extras_require={
         "devel": [
