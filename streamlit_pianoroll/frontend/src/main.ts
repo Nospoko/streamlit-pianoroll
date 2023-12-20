@@ -10,12 +10,10 @@ export function afterContentLoaded() {
 
   // These are here to verify that it works, TODO delete if not operation critical
   player.addEventListener('start', () => {
-    console.log("EVENT!");
     Streamlit.setFrameHeight()
   }, false);
 
   player.addEventListener('load', () => {
-    console.log("LOAD EVENT!");
     Streamlit.setFrameHeight()
   }, false);
 }

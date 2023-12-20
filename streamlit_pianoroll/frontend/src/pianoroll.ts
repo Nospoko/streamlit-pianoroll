@@ -4,6 +4,8 @@ import { DEVON_R } from "./colors"
 
 class PianoRoll {
   svgElement: SVGSVGElement;
+  keyboardSvg: SVGSVGElement;
+  notesSvg: SVGSVGElement;
   end: number;
   start: number;
   pitchMin!: number
@@ -23,6 +25,27 @@ class PianoRoll {
 
     this.svgElement.setAttribute("viewBox", "0 0 1 1");
     this.svgElement.setAttribute("preserveAspectRatio", "none");
+
+    this.notesSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    this.notesSvg.setAttribute("width", "98%");
+    this.notesSvg.setAttribute("height", "100%");
+    this.notesSvg.setAttribute("x", "2%");
+
+    this.notesSvg.innerHTML = ""
+    this.notesSvg.setAttribute("viewBox", "0 0 1 1");
+    this.notesSvg.setAttribute("preserveAspectRatio", "none");
+    this.svgElement.appendChild(this.notesSvg);
+
+    // Sub-SVG to draw the keyboard on
+    this.keyboardSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    this.keyboardSvg.setAttribute("width", "2%");
+    this.keyboardSvg.setAttribute("height", "100%");
+
+    this.keyboardSvg.innerHTML = ""
+    this.keyboardSvg.setAttribute("viewBox", "0 0 1 1");
+    this.keyboardSvg.setAttribute("preserveAspectRatio", "none");
+    this.svgElement.appendChild(this.keyboardSvg);
+
     this.colormap = DEVON_R;
 
     this.drawPianoRoll(sequence);
@@ -49,6 +72,7 @@ class PianoRoll {
     this.pitchSpan = this.pitchMax - this.pitchMin;
     this.noteHeight = 1 / this.pitchSpan;
 
+    this.drawKeyboard(this.pitchMin, this.pitchMax);
     this.drawEmptyPianoRoll(this.pitchMin, this.pitchMax);
 
     this.drawNotes(sequence);
@@ -62,7 +86,7 @@ class PianoRoll {
     line.setAttribute('stroke', '#E8A03E');
     line.setAttribute('stroke-width', '0.002');
     this.timeIndicator = line;
-    this.svgElement.appendChild(this.timeIndicator);
+    this.notesSvg.appendChild(this.timeIndicator);
   }
 
   public redrawWithNewTime(currentTime: number): void {
@@ -130,7 +154,7 @@ class PianoRoll {
     sequence.forEach((note: Note) => {
       const noteRectangleInfo = this.createNoteRectangle(note);
 
-      this.svgElement.appendChild(noteRectangleInfo.noteRectangle);
+      this.notesSvg.appendChild(noteRectangleInfo.noteRectangle);
       this.displayedNotes.push(noteRectangleInfo);
     });
   }
@@ -167,12 +191,12 @@ class PianoRoll {
 
   private drawBlackKeyBackground(y: number, height: number): void {
     const rect = this.createRectangle(0, y, 1, height, this.colormap[12], 0.666);
-    this.svgElement.appendChild(rect);
+    this.notesSvg.appendChild(rect);
   }
 
   private drawKeySeparator(y: number, isOctave: boolean): void {
     const line = this.createLine(0, y, 2, y, isOctave ? 0.003 : 0.001);
-    this.svgElement.appendChild(line);
+    this.notesSvg.appendChild(line);
   }
 
   private createRectangle(
@@ -209,6 +233,64 @@ class PianoRoll {
     line.setAttribute('stroke-width', `${strokeWidth}`);
     line.setAttribute('stroke', 'black');
     return line;
+  }
+
+  drawKeyboard(pitch_min: number, pitch_max: number) {
+    const pitch_span = pitch_max - pitch_min;
+    for (let it = pitch_min; it <= pitch_max + 1; it++) {
+      // Black keys
+      if ([1, 3, 6, 8, 10].includes(it % 12)) {
+        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        const y = 1 - (it - pitch_min) / pitch_span;
+        const x = 0;
+        const h = 1 / pitch_span;
+        const w = 1;
+
+        rect.setAttribute('fill', 'black');
+        rect.setAttribute('x', `${x}`);
+        rect.setAttribute('y', `${y}`);
+        rect.setAttribute('width', `${w}`);
+        rect.setAttribute('height', `${h}`);
+        this.keyboardSvg.appendChild(rect);
+      }
+
+      // Key separation
+      var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      const y = 1 - (it - pitch_min) / pitch_span + 1 / pitch_span;
+      line.setAttribute('x1', '0');
+      line.setAttribute('y1', `${y}`);
+      line.setAttribute('x2', '2');
+      line.setAttribute('y2', `${y}`);
+      let line_width;
+
+      // Every octave, line is bolder
+      if (it % 12 === 0) {
+        line_width = 0.003;
+      } else {
+        line_width = 0.001;
+      }
+      line.setAttribute('stroke-width', `${line_width}`);
+      line.setAttribute('stroke', 'black');
+      this.keyboardSvg.appendChild(line);
+    }
+
+    var line2 = document.createElementNS('http://www.w3.org/2000/svg', 'line2');
+    line2.setAttribute('x1', '0.99');
+    line2.setAttribute('y1', '0');
+    line2.setAttribute('x2', '0.99');
+    line2.setAttribute('y2', '1');
+    line2.setAttribute('stroke-width', '0.01');
+    line2.setAttribute('stroke', 'black');
+    this.keyboardSvg.appendChild(line2);
+
+    var line3 = document.createElementNS('http://www.w3.org/2000/svg', 'line3');
+    line3.setAttribute('x1', '0');
+    line3.setAttribute('y1', '0');
+    line3.setAttribute('x2', '0');
+    line3.setAttribute('y2', '1');
+    line3.setAttribute('stroke-width', '0.01');
+    line3.setAttribute('stroke', 'black');
+    this.keyboardSvg.appendChild(line3);
   }
 }
 

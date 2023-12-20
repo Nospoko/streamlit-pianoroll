@@ -33,7 +33,7 @@ $ npm run start  # Start the Webpack dev server
 $ cd template
 $ . venv/bin/activate  # activate the venv you created earlier
 $ pip install -e . # install template as editable package
-$ streamlit run pianoroll_streamlit/example.py  # run the example
+$ streamlit run streamlit_pianoroll/example.py  # run the example
 ```
 * If all goes well, you should see something like this:
 
