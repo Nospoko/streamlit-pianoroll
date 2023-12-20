@@ -37,6 +37,7 @@ $ streamlit run streamlit_pianoroll/example.py  # run the example
 ```
 * If all goes well, you should see something like this:
 
+<img width="666" alt="image" src="https://github.com/Nospoko/streamlit-pianoroll/assets/8056825/dcd09a8e-89b3-463b-854f-9fe3c18e8037">
 
 ### Code Style
 
