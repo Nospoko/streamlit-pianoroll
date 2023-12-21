@@ -12,12 +12,14 @@ class PianoRoll {
   pitchMax!: number
   pitchSpan!: number
   noteHeight!: number;
-  backgroundColormap: any;
   colormap: any;
   displayedNotes!: NoteRectangleInfo[];
   timeIndicator: SVGLineElement | null;
 
-  constructor(svgElement: SVGSVGElement, sequence: NoteSequence) {
+  constructor(
+    svgElement: SVGSVGElement,
+    sequence: NoteSequence,
+  ) {
     this.svgElement = svgElement;
     this.timeIndicator = null;
     this.start = 0;
@@ -166,7 +168,13 @@ class PianoRoll {
     const x = this.timeToX(note.startTime - (this.start || 0));
     const w = this.timeToX(note.endTime - note.startTime);
     const y = 1 - (note.pitch - this.pitchMin) / (this.pitchMax - this.pitchMin);
-    const color = this.colormap[note.velocity];
+
+    let color;
+    if (note.colorId === 0 || note.colorId === undefined) {
+      color = this.colormap[note.velocity];
+    } else {
+      color = "firebrick";
+    }
 
     noteRectangle.setAttribute('x', `${x}`);
     noteRectangle.setAttribute('width', `${w}`);

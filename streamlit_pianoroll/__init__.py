@@ -1,4 +1,5 @@
 import os
+import pandas as pd
 
 from fortepyan import MidiPiece
 import streamlit.components.v1 as components
@@ -78,9 +79,21 @@ def pianoroll_player(midi_data: dict, key=None):
     return component_value
 
 
-def from_fortepyan(piece: MidiPiece, key=None):
+def from_fortepyan(
+    piece: MidiPiece,
+    secondary_piece: MidiPiece = None,
+    key=None,
+):
     df = piece.df.copy()
 
+    if secondary_piece is not None:
+        df["colorId"] = 0
+        secondary_df = secondary_piece.df.copy()
+        secondary_df["colorId"] = 1
+        df = pd.concat([df, secondary_df])
+        df = df.sort_values("start", ignore_index=True)
+
+    # This is what the html midi player expects
     column_mapping = {
         "start": "startTime",
         "end": "endTime",

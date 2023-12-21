@@ -27,6 +27,7 @@ export interface Note {
   endTime: number;
   pitch: number;
   velocity: number;
+  colorId: number;
 }
 
 export type NoteSequence = Note[];
