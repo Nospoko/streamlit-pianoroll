@@ -66,6 +66,12 @@ pre-commit run --all-files
 
 
 ```
+# Prepare JS
+cd streamlit_pianoroll/frontend
+npm run build
+cd ../..
+
+# Releasey PYPI
 python setup.py sdist bdist_wheel
 python -m twine upload --repository pypi dist/*
 ```
