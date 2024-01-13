@@ -29,7 +29,7 @@ def make_some_notes(first_note: int, fortepyan_format: bool = False):
             "pitch": int(pitch),
             start_key: start_time,
             end_key: end_time,
-            "velocity": 50 + np.random.randint(40),
+            "velocity": 20 + np.random.randint(100),
         }
         notes.append(note)
 
@@ -48,7 +48,7 @@ for jt in range(2):
     st.markdown("---")
 
 notes_primary = make_some_notes(first_note=60, fortepyan_format=True)
-notes_secondary = make_some_notes(first_note=50, fortepyan_format=True)
+notes_secondary = make_some_notes(first_note=53, fortepyan_format=True)
 
 piece = MidiPiece(df=pd.DataFrame(notes_primary))
 piece_secondary = MidiPiece(df=pd.DataFrame(notes_secondary))

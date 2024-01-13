@@ -1,5 +1,5 @@
 import { Note, NoteSequence, NoteRectangleInfo } from "./types"
-import { DEVON_R } from "./colors"
+import { generateVelocityGradient, GradientStop } from './color_generator';
 
 
 class PianoRoll {
@@ -13,6 +13,7 @@ class PianoRoll {
   pitchSpan!: number
   noteHeight!: number;
   colormap: any;
+  secondaryColormap: any;
   displayedNotes!: NoteRectangleInfo[];
   timeIndicator: SVGLineElement | null;
 
@@ -48,9 +49,56 @@ class PianoRoll {
     this.keyboardSvg.setAttribute("preserveAspectRatio", "none");
     this.svgElement.appendChild(this.keyboardSvg);
 
-    this.colormap = DEVON_R;
-
+    this.initializeColors();
     this.drawPianoRoll(sequence);
+  }
+
+  private initializeColors(): void {
+    const mainColors: GradientStop[] = [
+      { pos: 0, color: "#5db5d5" },
+      { pos: 10, color: "#55a7c5" },
+      { pos: 20, color: "#4c99b6" },
+      { pos: 30, color: "#448ca7" },
+      { pos: 40, color: "#3c7f98" },
+      { pos: 50, color: "#347289" },
+      { pos: 60, color: "#2c657b" },
+      { pos: 70, color: "#24596c" },
+      { pos: 80, color: "#1d4d5f" },
+      { pos: 90, color: "#154151" },
+      { pos: 100, color: "#154151" }
+    ];
+    this.colormap = generateVelocityGradient(mainColors);
+
+    // Red version
+    // const secondaryColors: GradientStop[] = [
+    //   { pos: 0, color: "#944038" },
+    //   { pos: 10, color: "#893b34" },
+    //   { pos: 20, color: "#7e3730" },
+    //   { pos: 30, color: "#73322c" },
+    //   { pos: 40, color: "#692e28" },
+    //   { pos: 50, color: "#5f2924" },
+    //   { pos: 60, color: "#542520" },
+    //   { pos: 70, color: "#4a201d" },
+    //   { pos: 80, color: "#411c19" },
+    //   { pos: 90, color: "#371815" },
+    //   { pos: 100, color: "#371815" }
+    // ];
+    // Yellow version
+    const secondaryColors: GradientStop[] = [
+      { pos: 0, color: "#f4d1a4" },
+      { pos: 10, color: "#f3cc99" },
+      { pos: 20, color: "#f2c78e" },
+      { pos: 30, color: "#f1c183" },
+      { pos: 40, color: "#f0bc78" },
+      { pos: 50, color: "#efb76d" },
+      { pos: 60, color: "#eeb262" },
+      { pos: 70, color: "#ecad56" },
+      { pos: 80, color: "#eba74b" },
+      { pos: 90, color: "#e9a23f" },
+      { pos: 100, color: "#e9a23f" }
+    ];
+
+    this.secondaryColormap = generateVelocityGradient(secondaryColors);
   }
 
   public drawPianoRoll(sequence: NoteSequence): void {
@@ -112,9 +160,6 @@ class PianoRoll {
         // This class controls the transition rate (see note-noteRectangle.active css)
         note.noteRectangle.classList.add('active');
 
-        // Special color for active notes
-        note.noteRectangle.setAttribute('fill', '#5DB5D5');
-
         // Make it dance
         const new_y = note.y - height_gain / 2;
         note.noteRectangle.setAttribute('y', `${new_y}`);
@@ -173,7 +218,7 @@ class PianoRoll {
     if (note.colorId === 0 || note.colorId === undefined) {
       color = this.colormap[note.velocity];
     } else {
-      color = "firebrick";
+      color = this.secondaryColormap[note.velocity];
     }
 
     noteRectangle.setAttribute('x', `${x}`);
@@ -198,7 +243,7 @@ class PianoRoll {
   }
 
   private drawBlackKeyBackground(y: number, height: number): void {
-    const rect = this.createRectangle(0, y, 1, height, this.colormap[12], 0.666);
+    const rect = this.createRectangle(0, y, 1, height, "WhiteSmoke", 0.666);
     this.notesSvg.appendChild(rect);
   }
 
