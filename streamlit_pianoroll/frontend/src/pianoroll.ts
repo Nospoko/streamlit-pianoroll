@@ -6,8 +6,9 @@ class PianoRoll {
   svgElement: SVGSVGElement;
   keyboardSvg: SVGSVGElement;
   notesSvg: SVGSVGElement;
+  noteSequence: NoteSequence;
   end: number;
-  start: number;
+  duration_total: number;
   pitchMin!: number
   pitchMax!: number
   pitchSpan!: number
@@ -16,20 +17,36 @@ class PianoRoll {
   secondaryColormap: any;
   displayedNotes!: NoteRectangleInfo[];
   timeIndicator: SVGLineElement | null;
+  current_page_idx: number = 0;
+  max_single_page_duraion: number = 40;
+  target_page_duration: number = 20;
+  note_pages: NoteSequence[] = [];
+  page_duration: number = 40;
 
   constructor(
     svgElement: SVGSVGElement,
     sequence: NoteSequence,
   ) {
+    this.noteSequence = sequence;
     this.svgElement = svgElement;
     this.timeIndicator = null;
-    this.start = 0;
+    this.duration_total = sequence[sequence.length - 1].endTime;
     this.end = 1;
 
+    this.notesSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    this.keyboardSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+
+    this.prepareSvg();
+
+    this.initializeColors();
+    this.preparePagination();
+    this.drawPianoRoll();
+  }
+
+  private prepareSvg() {
     this.svgElement.setAttribute("viewBox", "0 0 1 1");
     this.svgElement.setAttribute("preserveAspectRatio", "none");
 
-    this.notesSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     this.notesSvg.setAttribute("width", "98%");
     this.notesSvg.setAttribute("height", "100%");
     this.notesSvg.setAttribute("x", "2%");
@@ -40,7 +57,6 @@ class PianoRoll {
     this.svgElement.appendChild(this.notesSvg);
 
     // Sub-SVG to draw the keyboard on
-    this.keyboardSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     this.keyboardSvg.setAttribute("width", "2%");
     this.keyboardSvg.setAttribute("height", "100%");
 
@@ -48,9 +64,33 @@ class PianoRoll {
     this.keyboardSvg.setAttribute("viewBox", "0 0 1 1");
     this.keyboardSvg.setAttribute("preserveAspectRatio", "none");
     this.svgElement.appendChild(this.keyboardSvg);
+  }
 
-    this.initializeColors();
-    this.drawPianoRoll(sequence);
+  private preparePagination() {
+    // If there's too many, we'll divide them into pianoroll pages
+    const notes = this.noteSequence;
+
+    if (this.duration_total <= this.max_single_page_duraion) {
+      // It's a single-page piano-roll
+      this.note_pages = [notes];
+      this.page_duration = this.duration_total;
+    }
+    else {
+      let n_pages = this.duration_total / this.target_page_duration;
+      n_pages = Math.ceil(n_pages)
+      this.page_duration = this.duration_total / n_pages;
+      for (let it = 0; it < n_pages; it++) {
+        let page_start_time = it * this.page_duration;
+        let page_end_time = (it + 1) * this.page_duration;
+        let page_notes = notes.filter(note => 
+          note.startTime >= page_start_time && note.startTime < page_end_time
+        );
+
+        this.note_pages.push(page_notes);
+      }
+    }
+
+    console.log("N PAGES:", this.note_pages.length);
   }
 
   private initializeColors(): void {
@@ -101,9 +141,10 @@ class PianoRoll {
     this.secondaryColormap = generateVelocityGradient(secondaryColors);
   }
 
-  public drawPianoRoll(sequence: NoteSequence): void {
-    this.start = sequence[0].startTime;
-    this.end = sequence[sequence.length - 1].endTime - (this.start || 0);
+  public drawPianoRoll(): void {
+    const sequence = this.note_pages[this.current_page_idx];
+
+    this.end = sequence[sequence.length - 1].endTime;
 
     const pitches = sequence.map(note => note.pitch);
 
@@ -139,7 +180,25 @@ class PianoRoll {
     this.notesSvg.appendChild(this.timeIndicator);
   }
 
+   private updateCurrentPageIdx(current_time: number): void {
+    // Find the current page
+    const page_index = Math.floor(current_time / this.page_duration);
+    if (page_index !== this.current_page_idx) {
+      this.current_page_idx = page_index;
+
+      // Using this as a cleaup method
+      this.prepareSvg()
+
+      // Redraw the new page
+      this.drawPianoRoll();
+    }
+
+    // Current redraw
+  }
+
   public redrawWithNewTime(currentTime: number): void {
+    this.updateCurrentPageIdx(currentTime)
+
     // Transform time to x coordinate
     const new_x = this.timeToX(currentTime);
 
@@ -177,7 +236,14 @@ class PianoRoll {
   }
 
   private timeToX(time: number): number {
-    return time / this.end;
+    // Offset Pagination
+    const offset = this.page_duration * this.current_page_idx;
+    return (time - offset) / this.page_duration;
+  }
+
+  private durationToWidth(duration: number): number {
+    // Offset Pagination
+    return duration / this.page_duration;
   }
 
   public drawEmptyPianoRoll(pitchMin: number, pitchMax: number): void {
@@ -210,8 +276,8 @@ class PianoRoll {
     note: Note,
   ): NoteRectangleInfo {
     const noteRectangle = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-    const x = this.timeToX(note.startTime - (this.start || 0));
-    const w = this.timeToX(note.endTime - note.startTime);
+    const x = this.timeToX(note.startTime);
+    const w = this.durationToWidth(note.endTime - note.startTime);
     const y = 1 - (note.pitch - this.pitchMin) / (this.pitchMax - this.pitchMin);
 
     let color;
