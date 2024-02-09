@@ -14,15 +14,6 @@
   background-color: #f0f0f0;
 }
 
-/* .pianoroll-border {
-  border: 3px solid black;
-  padding: 0px !important;
-}
-
-.pianoroll-background {
-  background-color: #f0f0f0;
-} */
-
 .note-rectangle {
   transition: width 1.3s ease-in-out, height 1.3s ease-in-out,
     x 1.3s ease-in-out, y 1.3s ease-in-out, fill 1.3s ease-in-out;
@@ -83,7 +74,7 @@ midi-player::part(control-panel) {
 
 .button:hover {
   background-color: #000000;
-  border: 3px solid #000000;
+  border: 3px solid #5c5c5c;
   color: #ffffff;
 }
 
@@ -107,11 +98,11 @@ midi-player::part(control-panel) {
 
 .container.theater-mode > .row:first-child {
   background-color: red;
-  /* padding: 0 20% !important; */
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  width: 100%;
 }
 
 .container.fullscreen-mode {

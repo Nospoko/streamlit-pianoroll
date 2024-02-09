@@ -81,28 +81,27 @@ export function onStreamlitRender(event: Event): void {
   player.noteSequence = midi_data
 }
 
-export function handleTheaterMode(_: Event): void {
+function handleTheaterMode(_: Event): void {
   const visualization = document.getElementById(
     "visualization"
   )! as HTMLDivElement
 
-  const windowWidth = window.innerWidth
   const pianorollPlayer = visualization.querySelector(
     ".pianoroll-player"
   )! as HTMLDivElement
+
+  resetMode()
 
   if (pianorollPlayer.dataset.mode === "theater") {
     visualization.classList.remove("theater-mode")
     delete pianorollPlayer.dataset.mode
-    pianorollPlayer.style.maxWidth = ""
   } else {
     visualization.classList.add("theater-mode")
     pianorollPlayer.dataset.mode = "theater"
-    pianorollPlayer.style.maxWidth = `${0.6 * windowWidth}px`
   }
 }
 
-export function handleFullscreenMode(_: Event): void {
+function handleFullscreenMode(_: Event): void {
   const visualization = document.getElementById(
     "visualization"
   )! as HTMLDivElement
@@ -110,6 +109,8 @@ export function handleFullscreenMode(_: Event): void {
   const pianorollPlayer = visualization.querySelector(
     ".pianoroll-player"
   )! as HTMLDivElement
+
+  resetMode()
 
   if (pianorollPlayer.dataset.mode === "fullscreen") {
     visualization.classList.remove("fullscreen-mode")
@@ -120,6 +121,16 @@ export function handleFullscreenMode(_: Event): void {
     pianorollPlayer.dataset.mode = "fullscreen"
     visualization.requestFullscreen()
   }
+}
+
+function resetMode(): void {
+  const visualization = document.getElementById(
+    "visualization"
+  )! as HTMLDivElement
+
+  visualization.classList.remove("theater-mode")
+  visualization.classList.remove("fullscreen-mode")
+  if (document.fullscreenElement) document.exitFullscreen()
 }
 
 function handleButtons(): void {
