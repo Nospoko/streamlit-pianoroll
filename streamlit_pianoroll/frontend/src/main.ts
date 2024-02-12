@@ -25,6 +25,17 @@ export function afterContentLoaded() {
   )
 
   handleButtons()
+
+  const pianorollPlayer = document.getElementById(
+    "pianoroll-player"
+  )! as HTMLDivElement
+
+  pianorollPlayer.addEventListener("mouseenter", handlePianorollMouseEnter)
+  pianorollPlayer.addEventListener("mouseleave", handlePianorollMouseLeave)
+  pianorollPlayer.addEventListener("animationend", handlePianorollAnimationEnd)
+  document.addEventListener("fullscreenchange", handleEscapeFullscreen)
+
+  resetTimer()
 }
 
 export function onStreamlitRender(event: Event): void {
@@ -81,66 +92,185 @@ export function onStreamlitRender(event: Event): void {
   player.noteSequence = midi_data
 }
 
-function handleTheaterMode(_: Event): void {
+function handleFullscreenMode(): void {
   const visualization = document.getElementById(
     "visualization"
   )! as HTMLDivElement
 
-  const pianorollPlayer = visualization.querySelector(
-    ".pianoroll-player"
+  const pianorollPlayer = document.getElementById(
+    "pianoroll-player"
   )! as HTMLDivElement
-
-  resetMode()
-
-  if (pianorollPlayer.dataset.mode === "theater") {
-    visualization.classList.remove("theater-mode")
-    delete pianorollPlayer.dataset.mode
-  } else {
-    visualization.classList.add("theater-mode")
-    pianorollPlayer.dataset.mode = "theater"
-  }
-}
-
-function handleFullscreenMode(_: Event): void {
-  const visualization = document.getElementById(
-    "visualization"
-  )! as HTMLDivElement
-
-  const pianorollPlayer = visualization.querySelector(
-    ".pianoroll-player"
-  )! as HTMLDivElement
-
-  resetMode()
 
   if (pianorollPlayer.dataset.mode === "fullscreen") {
     visualization.classList.remove("fullscreen-mode")
+    if (document.fullscreenElement) document.exitFullscreen()
     delete pianorollPlayer.dataset.mode
-    document.exitFullscreen()
+    handleFullscreenIcon("open")
   } else {
     visualization.classList.add("fullscreen-mode")
     pianorollPlayer.dataset.mode = "fullscreen"
     visualization.requestFullscreen()
+    handleFullscreenIcon("close")
   }
 }
 
-function resetMode(): void {
-  const visualization = document.getElementById(
-    "visualization"
-  )! as HTMLDivElement
-
-  visualization.classList.remove("theater-mode")
-  visualization.classList.remove("fullscreen-mode")
-  if (document.fullscreenElement) document.exitFullscreen()
-}
-
 function handleButtons(): void {
-  const theaterButton = document.getElementById(
-    "theater-button"
-  )! as HTMLButtonElement
   const fullscreenButton = document.getElementById(
     "fullscreen-button"
   )! as HTMLButtonElement
 
-  theaterButton.addEventListener("click", handleTheaterMode)
   fullscreenButton.addEventListener("click", handleFullscreenMode)
+}
+
+function handleFullscreenIcon(state: "open" | "close"): void {
+  const fullscreenButton = document.getElementById(
+    "fullscreen-button"
+  )! as HTMLButtonElement
+
+  const fullscreenIcons = {
+    open: `
+    <path
+      fill="currentColor"
+      d="M7 14H5v5h5v-2H7zm-2-4h2V7h3V5H5zm12 7h-3v2h5v-5h-2zM14 5v2h3v3h2V5z"
+    />`,
+    close: `
+    <path
+      fill="currentColor"
+      d="M5 16h3v3h2v-5H5zm3-8H5v2h5V5H8zm6 11h2v-3h3v-2h-5zm2-11V5h-2v5h5V8z"
+    />`,
+  }
+
+  if (fullscreenIcons[state]) {
+    const icon = `
+    <svg
+      focusable="false"
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      height="32px"
+      width="32px"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      ${fullscreenIcons[state]}
+    </svg>`
+
+    fullscreenButton.innerHTML = icon
+  }
+}
+
+function handleEscapeFullscreen(): void {
+  if (!document.fullscreenElement) {
+    const pianorollPlayer = document.getElementById(
+      "pianoroll-player"
+    )! as HTMLDivElement
+    const visualization = document.getElementById(
+      "visualization"
+    )! as HTMLDivElement
+
+    visualization.classList.remove("fullscreen-mode")
+    delete pianorollPlayer.dataset.mode
+  }
+}
+
+function handlePianorollMouseEnter(): void {
+  const pianorollPlayer = document.getElementById(
+    "pianoroll-player"
+  )! as HTMLDivElement
+
+  showPlayerControls()
+
+  pianorollPlayer.addEventListener("mousemove", handleCursor)
+}
+
+function handlePianorollMouseLeave(): void {
+  const pianorollPlayer = document.getElementById(
+    "pianoroll-player"
+  )! as HTMLDivElement
+
+  hidePlayerControls()
+
+  pianorollPlayer.removeEventListener("mousemove", handleCursor)
+  clearTimeout(timeoutId)
+}
+
+function handlePianorollAnimationEnd(e: AnimationEvent): void {
+  const overlay = e.target! as HTMLDivElement
+  const pianorollButtons = document.getElementById(
+    "pianoroll-buttons"
+  )! as HTMLDivElement
+
+  if (e.animationName === "fadeOut") {
+    overlay.classList.remove("fadeOut")
+    pianorollButtons.classList.remove("fadeOut")
+    overlay.classList.add("hidden")
+    pianorollButtons.classList.add("hidden")
+  }
+}
+
+function hidePlayerControls(): void {
+  const pianorollPlayer = document.getElementById(
+    "pianoroll-player"
+  )! as HTMLDivElement
+  const pianorollButtons = document.getElementById(
+    "pianoroll-buttons"
+  )! as HTMLDivElement
+  const overlay = pianorollPlayer.querySelector(
+    ".gradient-overlay"
+  )! as HTMLDivElement
+
+  overlay.classList.remove("fadeIn")
+  pianorollButtons.classList.remove("fadeIn")
+  overlay.classList.add("fadeOut")
+  pianorollButtons.classList.add("fadeOut")
+  pianorollPlayer.dataset.overlay = "false"
+}
+
+function showPlayerControls(): void {
+  const pianorollPlayer = document.getElementById(
+    "pianoroll-player"
+  )! as HTMLDivElement
+  const pianorollButtons = document.getElementById(
+    "pianoroll-buttons"
+  )! as HTMLDivElement
+  const overlay = pianorollPlayer.querySelector(
+    ".gradient-overlay"
+  )! as HTMLDivElement
+
+  overlay.classList.remove("hidden")
+  pianorollButtons.classList.remove("hidden")
+  overlay.classList.add("fadeIn")
+  pianorollButtons.classList.add("fadeIn")
+  pianorollPlayer.dataset.overlay = "true"
+}
+
+let timeoutId: ReturnType<typeof setTimeout> | undefined
+
+function hideCursor(): void {
+  const pianorollPlayer = document.getElementById(
+    "pianoroll-player"
+  )! as HTMLDivElement
+  pianorollPlayer.style.cursor = "none"
+
+  hidePlayerControls()
+}
+
+function showCursor(): void {
+  const pianorollPlayer = document.getElementById(
+    "pianoroll-player"
+  )! as HTMLDivElement
+  // pianorollPlayer.style.cursor = "auto"
+  pianorollPlayer.style.removeProperty("cursor")
+
+  showPlayerControls()
+}
+
+function resetTimer(): void {
+  if (timeoutId) {
+    clearTimeout(timeoutId)
+  }
+  timeoutId = setTimeout(hideCursor, 3000)
+}
+
+function handleCursor(): void {
+  showCursor()
+  resetTimer()
 }
