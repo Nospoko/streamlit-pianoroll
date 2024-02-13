@@ -102,10 +102,10 @@ function handleFullscreenMode(): void {
   )! as HTMLDivElement
 
   if (pianorollPlayer.dataset.mode === "fullscreen") {
-    visualization.classList.remove("fullscreen-mode")
+    // visualization.classList.remove("fullscreen-mode")
     if (document.fullscreenElement) document.exitFullscreen()
-    delete pianorollPlayer.dataset.mode
-    handleFullscreenIcon("open")
+    // delete pianorollPlayer.dataset.mode
+    // handleFullscreenIcon("open")
   } else {
     visualization.classList.add("fullscreen-mode")
     pianorollPlayer.dataset.mode = "fullscreen"
@@ -168,6 +168,8 @@ function handleEscapeFullscreen(): void {
 
     visualization.classList.remove("fullscreen-mode")
     delete pianorollPlayer.dataset.mode
+    handleFullscreenIcon("open")
+    Streamlit.setFrameHeight()
   }
 }
 
