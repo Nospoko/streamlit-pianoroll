@@ -64,6 +64,7 @@ export function onStreamlitRender(event: Event): void {
   )! as unknown as SVGSVGElement
   pianorollSvg.innerHTML = ""
 
+  // Prepare the notes and viualization manager (PianoRoll)
   const note_sequence = midi_data.notes
   const pianorollSvgVisualizer = enhancePianoRollSvg(pianorollSvg)
   const pianoRoll = new PianoRoll(pianorollSvgVisualizer, note_sequence)
