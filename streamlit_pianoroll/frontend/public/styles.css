@@ -1,25 +1,23 @@
 .container {
   position: relative;
+  padding: 0 !important;
 }
 
-.pianoroll-border {
-    border: 3px solid black;
-    padding: 0px !important;
+.row {
+  margin: 0 !important;
 }
 
-.pianoroll-background {
-  background-color: #F0F0F0;
+.pianoroll-svg-wrapper {
+  position: relative;
+  border: 3px solid black;
+  padding: 0px !important;
+  background-color: #f0f0f0;
 }
 
 .note-rectangle {
-  transition:
-    width 1.3s ease-in-out,
-    height 1.3s ease-in-out,
-    x 1.3s ease-in-out,
-    y 1.3s ease-in-out,
-    fill 1.3s ease-in-out;
+  transition: width 1.3s ease-in-out, height 1.3s ease-in-out,
+    x 1.3s ease-in-out, y 1.3s ease-in-out, fill 1.3s ease-in-out;
 }
-
 
 .note-rectangle.active {
   transition-property: width, height, x, y;
@@ -27,20 +25,154 @@
 }
 
 midi-player::part(control-panel) {
-	background: #F0F0F0;
-	color: black;
-	border-radius: 8px;
+  background: #f0f0f0;
+  color: black;
+  border-radius: 8px;
 }
 
 .pianoroll-link {
+  display: flex;
   position: absolute;
-  top: 2px;
-  right: 6px;
+  top: 4px;
+  right: 4px;
   width: 20px; /* Initial width */
   height: 20px; /* Initial height */
-  transition: transform 0.4s ease; /* Smooth transition for scaling */
+  transition: transform 0.3s ease; /* Smooth transition for scaling */
+  transform-origin: top right;
+  user-select: none;
 }
 
 .pianoroll-link:hover {
   transform: scale(1.2); /* Grow by 20% on hover */
+}
+
+.buttons-wrapper {
+  position: absolute;
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+  bottom: 0;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.button {
+  height: 2.5rem;
+  width: 2.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  appearance: none;
+  border: none;
+  cursor: pointer;
+  color: #ffffff;
+  background-color: transparent;
+  overflow: hidden;
+  pointer-events: all;
+}
+
+.button:hover svg {
+  animation: pulse 0.3s ease-in-out;
+}
+
+.control-panel {
+  height: 60px;
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+}
+
+.theater-mode {
+  width: 100%;
+}
+
+.theater-mode > .row:first-child {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.fullscreen-mode {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.fullscreen-mode > .row:first-child {
+  height: 100%;
+}
+
+.fullscreen-mode #my-svg {
+  height: 100%;
+  position: absolute;
+}
+
+.gradient-overlay {
+  position: absolute;
+  bottom: 0;
+  height: 100%;
+  max-height: 100px;
+  min-height: 60px;
+  z-index: 10;
+  width: 100%;
+  pointer-events: none;
+  background: rgb(255, 255, 255);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(128, 128, 128, 0.15) 40%,
+    rgba(64, 64, 64, 0.3) 100%
+  );
+  opacity: 0;
+  animation-duration: 0.1s;
+  animation-timing-function: cubic-bezier(0.4, 0, 1, 1);
+}
+
+.hidden {
+  display: none;
+}
+
+.fadeIn {
+  animation-name: fadeIn;
+  animation-fill-mode: forwards;
+}
+
+.fadeOut {
+  animation-name: fadeOut;
+  animation-fill-mode: forwards;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }

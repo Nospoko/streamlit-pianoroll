@@ -82,7 +82,7 @@ class PianoRoll {
       for (let it = 0; it < n_pages; it++) {
         let page_start_time = it * this.page_duration;
         let page_end_time = (it + 1) * this.page_duration;
-        let page_notes = notes.filter(note => 
+        let page_notes = notes.filter(note =>
           note.startTime >= page_start_time && note.startTime < page_end_time
         );
 

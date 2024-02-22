@@ -1,9 +1,9 @@
 import numpy as np
 import pandas as pd
 import streamlit as st
-
 from fortepyan import MidiPiece
-from streamlit_pianoroll import pianoroll_player, from_fortepyan
+
+from streamlit_pianoroll import from_fortepyan, pianoroll_player
 
 # Add some test code to play with the component while it's in development.
 # During development, we can run this just as we would any other Streamlit
