@@ -64,12 +64,6 @@ export function onStreamlitRender(event: Event): void {
   )! as unknown as SVGSVGElement
   pianorollSvg.innerHTML = ""
 
-  // Calculate the target height to maintain a 16:9 aspect ratio.
-  const targetHeight = pianorollSvg.clientWidth / (16 / 9);
-
-  // Set the calculated height on the SVG element.
-  pianorollSvg.style.height = `${targetHeight}`;
-
   // Prepare the notes and viualization manager (PianoRoll)
   const note_sequence = midi_data.notes
   const pianorollSvgVisualizer = enhancePianoRollSvg(pianorollSvg)
