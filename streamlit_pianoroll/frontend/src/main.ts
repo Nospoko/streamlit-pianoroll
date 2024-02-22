@@ -58,6 +58,16 @@ export function onStreamlitRender(event: Event): void {
   let midi_data = data.args["midi_data"]
   const player = document.getElementById("my-midi-player")! as MidiPlayerElement
 
+  // Streamlit is trying to refresh a pianoroll that already exists
+  // so to prevent player reload we exit here
+  // We need this because streamlit is confused about when to send render requests
+  if (
+    player.hasAttribute("data-midi") &&
+    player.getAttribute("data-midi") === JSON.stringify(midi_data)
+  ) {
+    return
+  } else player.setAttribute("data-midi", JSON.stringify(midi_data))
+
   // TODO: better typing, try to avoid "as unknown"
   const pianorollSvg = document.getElementById(
     "my-svg"
