@@ -72,6 +72,7 @@ npm run build
 cd ../..
 
 # Releasey PYPI
+echo "Update version in setup.py, pls"
 python setup.py sdist bdist_wheel
 python -m twine upload --repository pypi dist/*
 ```
