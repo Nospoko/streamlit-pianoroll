@@ -50,17 +50,32 @@ midi-player::part(control-panel) {
   transform: scale(1.2); /* Grow by 20% on hover */
 }
 
-.buttons-wrapper {
+.controls-wrapper {
   position: absolute;
   width: 100%;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
   gap: 4px;
   bottom: 0;
   z-index: 100;
-  pointer-events: none;
+  /* pointer-events: none; */
   opacity: 0;
+  padding: 0 4px;
+}
+
+.pianoroll-controls-left {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 4px;
+}
+
+.pianoroll-controls-right {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
 }
 
 .button {
@@ -70,7 +85,7 @@ midi-player::part(control-panel) {
   justify-content: center;
   align-items: center;
   margin: 0;
-  padding: 0;
+  padding: 0.25rem;
   appearance: none;
   border: none;
   cursor: pointer;
@@ -80,8 +95,12 @@ midi-player::part(control-panel) {
   pointer-events: all;
 }
 
-.button:hover svg {
+#fullscreen-button:hover svg {
   animation: pulse 0.3s ease-in-out;
+}
+
+#mute-button {
+  padding: 0.5rem;
 }
 
 .control-panel {
@@ -89,6 +108,87 @@ midi-player::part(control-panel) {
   display: flex !important;
   justify-content: center;
   align-items: center;
+}
+
+.slider-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+input {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+input[type="range"] {
+  appearance: none;
+  width: 100px;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 5px;
+  background-image: linear-gradient(#ffffff, #ffffff);
+  background-size: 85% 100%;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+
+[dir="rtl"] input[type="range"] {
+  background: #ffffff;
+  background-image: linear-gradient(#ffffff, #ffffff);
+  background-size: 15% 100%;
+  background-repeat: no-repeat;
+}
+
+/* Input Thumb */
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  height: 12px;
+  width: 12px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 2px 0 #505050;
+}
+
+input[type="range"]::-moz-range-thumb {
+  appearance: none;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 2px 0 #505050;
+}
+
+input[type="range"]::-ms-thumb {
+  appearance: none;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 2px 0 #505050;
+}
+
+/* Input Track */
+input[type="range"]::-webkit-slider-runnable-track {
+  appearance: none;
+  box-shadow: none;
+  border: none;
+  background: transparent;
+}
+
+input[type="range"]::-moz-range-track {
+  appearance: none;
+  box-shadow: none;
+  border: none;
+  background: transparent;
+}
+
+input[type="range"]::-ms-track {
+  appearance: none;
+  box-shadow: none;
+  border: none;
+  background: transparent;
 }
 
 .theater-mode {
@@ -131,8 +231,8 @@ midi-player::part(control-panel) {
   background: linear-gradient(
     180deg,
     rgba(255, 255, 255, 0) 0%,
-    rgba(128, 128, 128, 0.15) 40%,
-    rgba(64, 64, 64, 0.3) 100%
+    rgba(128, 128, 128, 0.4) 50%,
+    rgba(64, 64, 64, 0.8) 100%
   );
   opacity: 0;
   animation-duration: 0.1s;

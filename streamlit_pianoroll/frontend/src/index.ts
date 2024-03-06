@@ -1,7 +1,7 @@
 import { Streamlit } from "streamlit-component-lib"
 import { afterContentLoaded, onStreamlitRender } from "./main"
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   afterContentLoaded()
   Streamlit.setFrameHeight()
 })
