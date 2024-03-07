@@ -29,7 +29,12 @@
 
           <div id="pianoroll-controls" class="controls-wrapper hidden">
             <div class="pianoroll-controls-left">
-              <button id="mute-button" class="button">
+              <button
+                id="mute-button"
+                aria-label="Mute"
+                title="Mute"
+                class="button"
+              >
                 <svg
                   focusable="false"
                   aria-hidden="true"
@@ -58,6 +63,7 @@
                   max="5"
                   value="-3"
                   id="volume-slider"
+                  autocomplete="off"
                 />
               </div>
             </div>
