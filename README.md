@@ -1,4 +1,4 @@
-# streamlit-custom-component
+# Streamlit Pianoroll
 
 Streamlit component that allows you to play MIDI.
 
