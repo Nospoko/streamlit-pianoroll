@@ -6,6 +6,7 @@ export interface MidiPlayerElement extends HTMLElement {
       }
     }
   }
+  shadowRoot: ShadowRoot
   noteSequence?: NoteSequence
   addVisualizer(visualizer: PianoRollSvgVisualizer): void
 }

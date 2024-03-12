@@ -28,7 +28,9 @@
           </a>
 
           <div id="pianoroll-controls" class="controls-wrapper hidden">
-            <div class="pianoroll-controls-left">
+            <midi-player id="my-midi-player" sound-font> </midi-player>
+
+            <!-- <div class="pianoroll-controls-left">
               <button
                 id="mute-button"
                 aria-label="Mute"
@@ -84,18 +86,11 @@
                   />
                 </svg>
               </button>
-            </div>
+            </div> -->
           </div>
 
           <div id="pianoroll-overlay" class="gradient-overlay hidden"></div>
         </div>
-      </div>
-
-      <div class="row control-panel">
-        <div class="col">
-          <midi-player id="my-midi-player" sound-font> </midi-player>
-        </div>
-        <div class="col"></div>
       </div>
     </div>
     <noscript>You need to enable JavaScript to run this app.</noscript>

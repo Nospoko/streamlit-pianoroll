@@ -297,3 +297,39 @@ input[type="range"]::-ms-track {
     opacity: 0;
   }
 }
+
+midi-player {
+  margin: 0;
+  width: 100%;
+}
+
+midi-player::part(control-panel) {
+  padding: 0;
+  background: transparent;
+  color: #ffffff;
+  border-radius: 0;
+}
+
+midi-player::part(pianoroll-controls-left) {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex: 1;
+}
+
+midi-player::part(pianoroll-controls-right) {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+midi-player::part(play-button) {
+  margin: 0;
+  height: 2.5rem;
+  width: 2.5rem;
+  color: #fff;
+}
+
+midi-player::part(seek-bar) {
+  display: none;
+}

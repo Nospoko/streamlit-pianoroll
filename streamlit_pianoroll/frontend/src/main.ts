@@ -5,7 +5,8 @@ import { MidiPlayerElement } from "./types"
 import { enhancePianoRollSvg } from "./enhanceVisualizer"
 
 import ViewsController from "./views_controller"
-import VolumeController from "./volume_controller"
+// import VolumeController from "./volume_controller"
+import PlayerControls from "./player_controls"
 
 export function afterContentLoaded() {
   const player = document.getElementById("my-midi-player")! as MidiPlayerElement
@@ -36,26 +37,29 @@ export function afterContentLoaded() {
   const pianoRollButtons = document.getElementById(
     "pianoroll-controls"
   )! as HTMLDivElement
-  const fullscreenButton = document.getElementById(
-    "fullscreen-button"
-  )! as HTMLButtonElement
+  // const fullscreenButton = document.getElementById(
+  //   "fullscreen-button"
+  // )! as HTMLButtonElement
   const pianoRollOverlay = document.getElementById(
     "pianoroll-overlay"
   )! as HTMLDivElement
+
+  // const volumeInput = document.getElementById(
+  //   "volume-slider"
+  // ) as HTMLInputElement
+
+  // new VolumeController(player, volumeInput)
+
+  const playerControls = new PlayerControls(player)
+  console.log(playerControls)
 
   new ViewsController(
     visualization,
     pianoRollPlayer,
     pianoRollButtons,
-    fullscreenButton,
+    playerControls.fullscreenButton,
     pianoRollOverlay
   )
-
-  const volumeInput = document.getElementById(
-    "volume-slider"
-  ) as HTMLInputElement
-
-  new VolumeController(player, volumeInput)
 }
 
 export function onStreamlitRender(event: Event): void {
