@@ -48,3 +48,9 @@ export interface NoteRectangleInfo {
   x_left: number
   x_right: number
 }
+
+export interface VolumeControl {
+  midiPlayer: MidiPlayerElement
+  volumeInput: HTMLInputElement
+  muteButton: HTMLButtonElement
+}

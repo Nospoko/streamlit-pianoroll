@@ -1,4 +1,6 @@
-import { MidiPlayerElement } from "./types"
+import { MidiPlayerElement, VolumeControl } from "./types"
+
+import VolumeController from "./volume_controller"
 
 class PlayerControls {
   midiPlayer: MidiPlayerElement
@@ -12,6 +14,7 @@ class PlayerControls {
   controlsElement: HTMLDivElement
   playButton: HTMLButtonElement
   timeElement: HTMLDivElement
+  volumeControl: VolumeControl
 
   constructor(midiPlayer: MidiPlayerElement) {
     this.midiPlayer = midiPlayer
@@ -30,6 +33,12 @@ class PlayerControls {
       '[part="play-button"]'
     )!
     this.timeElement = this.controlsElement.querySelector('[part="time"]')!
+
+    this.volumeControl = new VolumeController(
+      this.midiPlayer,
+      this.volumeSlider,
+      this.muteButton
+    )
 
     console.log(this.midiPlayer.shadowRoot)
 

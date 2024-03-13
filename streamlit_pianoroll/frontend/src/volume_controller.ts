@@ -9,12 +9,14 @@ class VolumeController {
   private volumeValue: number
   private isRTL: boolean
 
-  constructor(midiPlayer: MidiPlayerElement, volumeInput: HTMLInputElement) {
+  constructor(
+    midiPlayer: MidiPlayerElement,
+    volumeInput: HTMLInputElement,
+    muteButton: HTMLButtonElement
+  ) {
     this.midiPlayer = midiPlayer
     this.volumeInput = volumeInput
-    this.muteButton = document.getElementById(
-      "mute-button"
-    ) as HTMLButtonElement
+    this.muteButton = muteButton
     this.volumeState = "unmute"
     this.volumePercentage = 85
     this.volumeValue = -3
