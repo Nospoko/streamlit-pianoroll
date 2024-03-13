@@ -34,16 +34,16 @@ class PlayerControls {
     )!
     this.timeElement = this.controlsElement.querySelector('[part="time"]')!
 
+    console.log(this.midiPlayer.shadowRoot)
+
+    this.generateControls()
+    this.applyCustomStyling()
+
     this.volumeControl = new VolumeController(
       this.midiPlayer,
       this.volumeSlider,
       this.muteButton
     )
-
-    console.log(this.midiPlayer.shadowRoot)
-
-    this.generateControls()
-    this.applyCustomStyling()
   }
 
   private applyCustomStyling() {
