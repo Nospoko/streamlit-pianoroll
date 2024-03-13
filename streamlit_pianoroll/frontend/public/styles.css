@@ -21,7 +21,7 @@
 }
 
 .pianoroll-progress-bar {
-  background-color: red;
+  background-color: whitesmoke;
   width: 100%;
   height: 6.25rem;
 }
@@ -215,6 +215,7 @@ midi-player::part(control-panel) {
   background: transparent;
   color: #ddd;
   border-radius: 0;
+  overflow: visible;
 }
 
 midi-player::part(pianoroll-controls-left) {
@@ -270,5 +271,9 @@ midi-player::part(volume) {
 }
 
 midi-player::part(seek-bar) {
-  display: none;
+  /* display: none; */
+  position: absolute;
+  margin: 0;
+  top: -8px;
+  width: 100%;
 }

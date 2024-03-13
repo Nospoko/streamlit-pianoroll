@@ -46,13 +46,13 @@ class PlayerControls {
     )
   }
 
-  private applyCustomStyling() {
+  applyCustomStyling(externalStyles?: string) {
     const styles = `
     .controls > * {
       margin: 0;
     }
 
-    input[type="range"] {
+    input[type="range"].volume-slider {
       appearance: none;
       width: 100%;
       height: 3px;
@@ -64,7 +64,7 @@ class PlayerControls {
       cursor: pointer;
     }
 
-    [dir="rtl"] input[type="range"] {
+    [dir="rtl"] input[type="range"].volume-slider {
       background: #ffffff;
       background-image: linear-gradient(#ffffff, #ffffff);
       background-size: 15% 100%;
@@ -72,7 +72,7 @@ class PlayerControls {
     }
 
     /* Input Thumb */
-    input[type="range"]::-webkit-slider-thumb {
+    input[type="range"].volume-slider::-webkit-slider-thumb {
       appearance: none;
       height: 12px;
       width: 12px;
@@ -81,7 +81,7 @@ class PlayerControls {
       box-shadow: 0 0 2px 0 #505050;
     }
 
-    input[type="range"]::-moz-range-thumb {
+    input[type="range"].volume-slider::-moz-range-thumb {
       appearance: none;
       height: 12px;
       width: 12px;
@@ -90,7 +90,7 @@ class PlayerControls {
       box-shadow: 0 0 2px 0 #505050;
     }
 
-    input[type="range"]::-ms-thumb {
+    input[type="range"].volume-slider::-ms-thumb {
       appearance: none;
       height: 12px;
       width: 12px;
@@ -100,21 +100,21 @@ class PlayerControls {
     }
 
     /* Input Track */
-    input[type="range"]::-webkit-slider-runnable-track {
+    input[type="range"].volume-slider::-webkit-slider-runnable-track {
       appearance: none;
       box-shadow: none;
       border: none;
       background: transparent;
     }
 
-    input[type="range"]::-moz-range-track {
+    input[type="range"].volume-slider::-moz-range-track {
       appearance: none;
       box-shadow: none;
       border: none;
       background: transparent;
     }
 
-    input[type="range"]::-ms-track {
+    input[type="range"].volume-slider::-ms-track {
       appearance: none;
       box-shadow: none;
       border: none;
@@ -174,7 +174,7 @@ class PlayerControls {
     }
     `
 
-    this.playerStyles.innerHTML += styles
+    this.playerStyles.innerHTML += styles + externalStyles
   }
 
   private generateControls() {
@@ -333,6 +333,7 @@ class PlayerControls {
     this.volumeSlider.setAttribute("max", "5")
     this.volumeSlider.setAttribute("value", "-3")
     // this.volumeSlider.id = "volume-slider"
+    this.volumeSlider.className = "volume-slider"
     this.volumeSlider.setAttribute("autocomplete", "off")
 
     this.sliderWrapper.appendChild(this.volumeSlider)

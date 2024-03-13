@@ -7,6 +7,7 @@ import { enhancePianoRollSvg } from "./enhanceVisualizer"
 import ViewsController from "./views_controller"
 // import VolumeController from "./volume_controller"
 import PlayerControls from "./player_controls"
+import PlayerProgressController from "./player_progress_controller"
 
 export function afterContentLoaded() {
   const player = document.getElementById("my-midi-player")! as MidiPlayerElement
@@ -51,7 +52,6 @@ export function afterContentLoaded() {
   // new VolumeController(player, volumeInput)
 
   const playerControls = new PlayerControls(player)
-  console.log(playerControls)
 
   new ViewsController(
     visualization,
@@ -60,6 +60,15 @@ export function afterContentLoaded() {
     playerControls.fullscreenButton,
     pianoRollOverlay
   )
+
+  const progressBar = visualization.querySelector(
+    "#progress-bar"
+  )! as SVGElement
+  const progressLine = visualization.querySelector(
+    "#progress-line"
+  )! as SVGLineElement
+
+  new PlayerProgressController(player, progressLine, progressBar)
 }
 
 export function onStreamlitRender(event: Event): void {
