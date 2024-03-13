@@ -218,7 +218,7 @@ class PlayerControls {
     const playSVG = this.playButton.querySelector(
       ".icon.play-icon"
     ) as HTMLSpanElement
-    playSVG.innerHTML = " "
+    playSVG.innerHTML = ""
     playSVG.appendChild(playButtonPlayIcon)
 
     // Replace pause icon
@@ -245,40 +245,38 @@ class PlayerControls {
     const stopSVG = this.playButton.querySelector(
       ".icon.stop-icon"
     ) as HTMLSpanElement
-    stopSVG.innerHTML = " "
+    stopSVG.innerHTML = ""
     stopSVG.appendChild(playButtonPauseIcon)
 
-    // // Replace error icon
-    // const playButtonErrorIcon = document.createElementNS(
-    //   "http://www.w3.org/2000/svg",
-    //   "svg"
-    // )
-    // playButtonErrorIcon.setAttribute("width", "18")
-    // playButtonErrorIcon.setAttribute("height", "18")
-    // playButtonErrorIcon.setAttribute("viewBox", "0 0 18 18")
-    // playButtonErrorIcon.setAttribute("fill", "none")
-    // playButtonErrorIcon.setAttribute("xmlns", "http://www.w3.org/2000/svg")
+    // Replace error icon
+    const playButtonErrorIcon = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "svg"
+    )
+    playButtonErrorIcon.setAttribute("width", "18")
+    playButtonErrorIcon.setAttribute("height", "18")
+    playButtonErrorIcon.setAttribute("viewBox", "0 0 18 18")
+    playButtonErrorIcon.setAttribute("fill", "currentColor")
+    playButtonErrorIcon.setAttribute("xmlns", "http://www.w3.org/2000/svg")
 
-    // const playButtonErrorPath = document.createElementNS(
-    //   "http://www.w3.org/2000/svg",
-    //   "path"
-    // )
-    // playButtonErrorPath.setAttribute(
-    //   "d",
-    //   "M9 6.5V9.83333M9 12.3333V12.3417M1.5 9C1.5 9.98491 1.69399 10.9602 2.0709 11.8701C2.44781 12.7801 3.00026 13.6069 3.6967 14.3033C4.39314 14.9997 5.21993 15.5522 6.12987 15.9291C7.03982 16.306 8.01509 16.5 9 16.5C9.98491 16.5 10.9602 16.306 11.8701 15.9291C12.7801 15.5522 13.6069 14.9997 14.3033 14.3033C14.9997 13.6069 15.5522 12.7801 15.9291 11.8701C16.306 10.9602 16.5 9.98491 16.5 9C16.5 8.01509 16.306 7.03982 15.9291 6.12987C15.5522 5.21993 14.9997 4.39314 14.3033 3.6967C13.6069 3.00026 12.7801 2.44781 11.8701 2.0709C10.9602 1.69399 9.98491 1.5 9 1.5C8.01509 1.5 7.03982 1.69399 6.12987 2.0709C5.21993 2.44781 4.39314 3.00026 3.6967 3.6967C3.00026 4.39314 2.44781 5.21993 2.0709 6.12987C1.69399 7.03982 1.5 8.01509 1.5 9Z"
-    // )
-    // playButtonErrorPath.setAttribute("stroke", "currentColor")
-    // playButtonErrorPath.setAttribute("stroke-width", "2")
-    // playButtonErrorPath.setAttribute("stroke-linecap", "round")
-    // playButtonErrorPath.setAttribute("stroke-linejoin", "round")
+    const playButtonErrorPath = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "path"
+    )
+    playButtonErrorPath.setAttribute(
+      "d",
+      "M18 9C18 13.9706 13.9706 18 9 18C4.02944 18 0 13.9706 0 9C0 4.02944 4.02944 0 9 0C13.9706 0 18 4.02944 18 9ZM10.2 5.95V10.05C10.2 10.7127 9.66273 11.25 8.99999 11.25C8.33725 11.25 7.79999 10.7127 7.79999 10.05V5.95C7.79999 5.28726 8.33725 4.75 8.99999 4.75C9.66273 4.75 10.2 5.28726 10.2 5.95ZM8.99999 14.2C9.66273 14.2 10.2 13.6627 10.2 13C10.2 12.3372 9.66273 11.8 8.99999 11.8C8.33725 11.8 7.79999 12.3372 7.79999 13C7.79999 13.6627 8.33725 14.2 8.99999 14.2Z"
+    )
+    playButtonErrorPath.setAttribute("fill-rule", "evenodd")
+    playButtonErrorPath.setAttribute("clip-rule", "evenodd")
 
-    // playButtonErrorIcon.appendChild(playButtonErrorPath)
+    playButtonErrorIcon.appendChild(playButtonErrorPath)
 
-    // const errorSVG = this.playButton.querySelector(
-    //   ".icon.error-icon"
-    // ) as HTMLSpanElement
-    // errorSVG.innerHTML = " "
-    // errorSVG.appendChild(playButtonErrorIcon)
+    const errorSVG = this.playButton.querySelector(
+      ".icon.error-icon"
+    ) as HTMLSpanElement
+    errorSVG.innerHTML = ""
+    errorSVG.appendChild(playButtonErrorIcon)
 
     // Create mute button with volume control input
     this.muteButton.className = "mute-button"
