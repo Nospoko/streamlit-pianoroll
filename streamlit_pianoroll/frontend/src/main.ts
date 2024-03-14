@@ -88,10 +88,8 @@ export function onStreamlitRender(event: Event): void {
     return
   } else player.setAttribute("data-midi", JSON.stringify(midi_data))
 
-  // TODO: better typing, try to avoid "as unknown"
-  const pianorollSvg = document.getElementById(
-    "my-svg"
-  )! as unknown as SVGSVGElement
+  // Fixed typing to avoid "as unknown"
+  const pianorollSvg = document.querySelector("#my-svg")! as SVGSVGElement
   pianorollSvg.innerHTML = ""
 
   // Prepare the notes and viualization manager (PianoRoll)
