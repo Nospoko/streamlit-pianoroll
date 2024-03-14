@@ -8,6 +8,7 @@ export interface MidiPlayerElement extends HTMLElement {
   }
   start(): void
   stop(): void
+  playing: boolean
   shadowRoot: ShadowRoot
   currentTime: number
   duration: number

@@ -4,15 +4,37 @@ class PlayerProgressController {
   midiPlayer: MidiPlayerElement
   progressLine: SVGLineElement
   progressBarSVG: SVGElement
+  pianoRoll: any
+  pianoRollSvgVisualizer: any
+  isPlaying: boolean
 
   constructor(
     midiPlayer: MidiPlayerElement,
     progressLine: SVGLineElement,
-    progressBarSVG: SVGElement
+    progressBarSVG: SVGElement,
+    pianoRoll: any,
+    pianoRollSvgVisualizer: any
   ) {
     this.midiPlayer = midiPlayer
     this.progressLine = progressLine
     this.progressBarSVG = progressBarSVG
+    this.pianoRoll = pianoRoll
+    this.pianoRollSvgVisualizer = pianoRollSvgVisualizer
+    this.isPlaying = this.midiPlayer.playing
+
+    // console.log(this.pianoRoll)
+    // console.log(this.pianoRollSvgVisualizer)
+
+    this.pianoRollSvgVisualizer.redraw = (noteDetails: any) => {
+      const currentTime = noteDetails.startTime
+      pianoRoll.redrawWithNewTime(currentTime)
+      const newPosition = currentTime / this.midiPlayer.duration
+
+      this.progressLine.setAttribute("x1", newPosition.toString())
+      this.progressLine.setAttribute("x2", newPosition.toString())
+    }
+
+    this.pianoRoll.drawProgressTimeline()
 
     this.progressBarSVG.addEventListener("mousedown", this.onMouseDown)
     this.progressBarSVG.addEventListener("touchstart", this.onTouchDown)
@@ -21,6 +43,9 @@ class PlayerProgressController {
   private onMouseDown = (e: MouseEvent) => {
     this.setNewPosition(e.clientX)
 
+    this.isPlaying = this.midiPlayer.playing
+    this.midiPlayer.stop()
+
     document.addEventListener("mousemove", this.onMouseMove)
     document.addEventListener("mouseup", this.onMouseUp)
   }
@@ -28,6 +53,9 @@ class PlayerProgressController {
   private onTouchDown = (e: TouchEvent) => {
     const touch = e.touches[0]
     this.setNewPosition(touch.clientX)
+
+    this.isPlaying = this.midiPlayer.playing
+    this.midiPlayer.stop()
 
     document.addEventListener("touchmove", this.onTouchMove)
     document.addEventListener("touchend", this.onTouchEnd)
@@ -46,33 +74,45 @@ class PlayerProgressController {
     document.removeEventListener("mousemove", this.onMouseMove)
     document.removeEventListener("mouseup", this.onMouseUp)
 
-    this.startPlayer()
+    if (this.isPlaying) this.startPlayer()
   }
 
   private onTouchEnd = () => {
     document.removeEventListener("touchmove", this.onTouchMove)
     document.removeEventListener("touchend", this.onTouchEnd)
 
-    this.startPlayer()
+    if (this.isPlaying) this.startPlayer()
   }
 
   private setNewPosition(pos: number) {
+    if (!this.midiPlayer.duration) return
+
     const lineOffset = 3
     const svgBounding = this.progressBarSVG.getBoundingClientRect()
     const calcPos = (pos - lineOffset) / svgBounding.width
-    const newPosition = Math.min(Math.max(calcPos, 0), 1)
+    const newPosition = Math.min(Math.max(calcPos, 0.001), 0.999)
+    const currentTime =
+      Math.min(Math.max(calcPos, 0), 1) * this.midiPlayer.duration
 
     this.progressLine.setAttribute("x1", newPosition.toString())
     this.progressLine.setAttribute("x2", newPosition.toString())
 
-    this.midiPlayer.stop()
-    this.midiPlayer.currentTime = newPosition * this.midiPlayer.duration
+    this.midiPlayer.currentTime = currentTime
+
+    if (
+      this.midiPlayer.currentTime.toFixed(2) ===
+      this.midiPlayer.duration.toFixed(2)
+    )
+      return
+
+    this.pianoRoll.redrawWithNewTime(currentTime)
   }
 
   private startPlayer() {
     if (
       this.midiPlayer.currentTime.toFixed(2) ===
-      this.midiPlayer.duration.toFixed(2)
+        this.midiPlayer.duration.toFixed(2) ||
+      !this.midiPlayer.duration
     )
       return
 
