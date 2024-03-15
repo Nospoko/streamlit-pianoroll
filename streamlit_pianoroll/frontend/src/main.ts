@@ -60,17 +60,24 @@ function preparePlayerControls(
   const progressBar = visualization.querySelector(
     "#progress-bar"
   )! as SVGSVGElement
-  const progressLine = visualization.querySelector(
-    "#progress-line"
-  )! as SVGLineElement
 
-  new PlayerProgressController(
+  const playerProgressController = new PlayerProgressController(
     player,
-    progressLine,
     progressBar,
-    pianoRoll,
-    pianoRollSvgVisualizer
+    pianoRoll
   )
+
+  pianoRollSvgVisualizer.reload = () => {}
+  pianoRollSvgVisualizer.clearActiveNotes = () => {}
+  pianoRollSvgVisualizer.redraw = (noteDetails: any) => {
+    const currentTime = noteDetails.startTime
+    pianoRoll.redrawWithNewTime(currentTime)
+    const newPosition = currentTime / player.duration
+
+    playerProgressController.updateProgressIndicatorPosition(newPosition)
+    playerProgressController.updateCurrentAreaRectanglePosition()
+  }
+  player.addVisualizer(pianoRollSvgVisualizer)
 }
 
 export function onStreamlitRender(event: Event): void {
@@ -98,14 +105,6 @@ export function onStreamlitRender(event: Event): void {
   const note_sequence = midi_data.notes
   const pianorollSvgVisualizer = enhancePianoRollSvg(pianorollSvg)
   const pianoRoll = new PianoRoll(pianorollSvgVisualizer, note_sequence)
-
-  pianorollSvgVisualizer.reload = () => {}
-  pianorollSvgVisualizer.clearActiveNotes = () => {}
-  pianorollSvgVisualizer.redraw = (noteDetails) => {
-    const currentTime = noteDetails.startTime
-    pianoRoll.redrawWithNewTime(currentTime)
-  }
-  player.addVisualizer(pianorollSvgVisualizer)
 
   preparePlayerControls(player, pianoRoll, pianorollSvgVisualizer)
 

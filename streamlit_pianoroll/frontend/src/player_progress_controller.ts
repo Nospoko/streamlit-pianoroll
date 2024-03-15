@@ -1,45 +1,36 @@
 import PianoRoll from "./pianoroll"
-import { MidiPlayerElement, PianoRollSvgVisualizer } from "./types"
+import { MidiPlayerElement, Note } from "./types"
 
 class PlayerProgressController {
   midiPlayer: MidiPlayerElement
-  progressIndicator: SVGLineElement
   progressBarSVG: SVGSVGElement
+  progressIndicator: SVGLineElement
+  currentAreaRectangle: SVGRectElement
   pianoRoll: PianoRoll
-  pianoRollSvgVisualizer: PianoRollSvgVisualizer
   isPlaying: boolean
 
   constructor(
     midiPlayer: MidiPlayerElement,
-    progressIndicator: SVGLineElement,
     progressBarSVG: SVGSVGElement,
-    pianoRoll: any,
-    pianoRollSvgVisualizer: any
+    pianoRoll: any
   ) {
     this.midiPlayer = midiPlayer
-    this.progressIndicator = progressIndicator
     this.progressBarSVG = progressBarSVG
     this.pianoRoll = pianoRoll
-    this.pianoRollSvgVisualizer = pianoRollSvgVisualizer
     this.isPlaying = this.midiPlayer.playing
 
-    // console.log(this.pianoRoll)
-    // console.log(this.pianoRollSvgVisualizer)
-
-    this.pianoRollSvgVisualizer.redraw = (noteDetails: any) => {
-      const currentTime = noteDetails.startTime
-      pianoRoll.redrawWithNewTime(currentTime)
-      const newPosition = currentTime / this.midiPlayer.duration
-
-      this.updateProgressIndicatorPosition(newPosition)
-
-      this.pianoRoll.updateCurrentAreaRectanglePosition()
-    }
-
-    this.pianoRoll.drawProgressTimeline(
-      this.progressBarSVG,
-      this.progressIndicator
+    this.progressIndicator = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "line"
     )
+    this.currentAreaRectangle = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "rect"
+    )
+
+    this.drawProgressTimeline()
+    this.drawCurrentAreaRectangle()
+    this.drawProgressIndicator()
 
     this.progressBarSVG.addEventListener("mousedown", this.onMouseDown)
     this.progressBarSVG.addEventListener("touchstart", this.onTouchDown)
@@ -110,7 +101,7 @@ class PlayerProgressController {
       return
 
     this.pianoRoll.redrawWithNewTime(currentTime)
-    this.pianoRoll.updateCurrentAreaRectanglePosition()
+    this.updateCurrentAreaRectanglePosition()
   }
 
   private startPlayer() {
@@ -121,12 +112,81 @@ class PlayerProgressController {
     )
       return
 
-    this.midiPlayer.start()
+    setTimeout(() => {
+      this.midiPlayer.start()
+    }, 50)
   }
 
-  private updateProgressIndicatorPosition(newPosition: number) {
+  updateProgressIndicatorPosition(newPosition: number) {
     this.progressIndicator.setAttribute("x1", newPosition.toString())
     this.progressIndicator.setAttribute("x2", newPosition.toString())
+  }
+
+  private drawProgressIndicator() {
+    this.progressIndicator.setAttribute("x1", "0.001")
+    this.progressIndicator.setAttribute("y1", "0")
+    this.progressIndicator.setAttribute("x2", "0.001")
+    this.progressIndicator.setAttribute("y2", "1")
+    this.progressIndicator.setAttribute("stroke", "#E8A03E")
+    this.progressIndicator.setAttribute("stroke-width", "0.002")
+    this.progressBarSVG.appendChild(this.progressIndicator)
+  }
+
+  private drawCurrentAreaRectangle() {
+    const rectWidth = 100 / this.pianoRoll.note_pages.length
+    this.currentAreaRectangle.id = "current-area-rectangle"
+    this.currentAreaRectangle.setAttribute("x", "0")
+    this.currentAreaRectangle.setAttribute("y", "0")
+    this.currentAreaRectangle.setAttribute("width", `${rectWidth}%`)
+    this.currentAreaRectangle.setAttribute("height", "100%")
+    this.currentAreaRectangle.setAttribute("stroke", "grey")
+    this.currentAreaRectangle.setAttribute("stroke-width", "0.002")
+    this.currentAreaRectangle.setAttribute("fill", "WhiteSmoke")
+    this.currentAreaRectangle.setAttribute("fill-opacity", "0.5")
+    this.progressBarSVG.appendChild(this.currentAreaRectangle)
+  }
+
+  private drawProgressTimeline() {
+    this.pianoRoll.drawEmptyPianoRoll(
+      this.pianoRoll.pitchMin,
+      this.pianoRoll.pitchMax,
+      this.progressBarSVG
+    )
+
+    const sequenceSvg = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "svg"
+    )
+    sequenceSvg.innerHTML = ""
+    sequenceSvg.setAttribute("width", `100%`)
+    sequenceSvg.setAttribute("height", "100%")
+    sequenceSvg.setAttribute(
+      "viewBox",
+      `0 0 ${this.pianoRoll.note_pages.length} 1`
+    )
+    sequenceSvg.setAttribute("preserveAspectRatio", "none")
+
+    for (
+      let current_page_idx = 0;
+      current_page_idx < this.pianoRoll.note_pages.length;
+      current_page_idx++
+    ) {
+      const sequence = this.pianoRoll.note_pages[current_page_idx]
+
+      sequence.forEach((note: Note) => {
+        const noteRectangleInfo = this.pianoRoll.createNoteRectangle(note)
+        sequenceSvg.appendChild(noteRectangleInfo.noteRectangle)
+      })
+    }
+
+    this.progressBarSVG.appendChild(sequenceSvg)
+    this.progressBarSVG.appendChild(this.progressIndicator)
+  }
+
+  updateCurrentAreaRectanglePosition() {
+    const percentage = 100 / this.pianoRoll.note_pages.length
+    const offset = percentage * this.pianoRoll.current_page_idx
+    this.currentAreaRectangle.setAttribute("x", `${offset}%`)
   }
 }
 

@@ -34,8 +34,6 @@ class PlayerControls {
     )!
     this.timeElement = this.controlsElement.querySelector('[part="time"]')!
 
-    console.log(this.midiPlayer.shadowRoot)
-
     this.generateControls()
     this.applyCustomStyling()
 
