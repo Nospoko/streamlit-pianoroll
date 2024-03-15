@@ -49,6 +49,9 @@ function preparePlayerControls(
 
   const playerControls = new PlayerControls(player)
 
+  const playButton = document.getElementById("play-button") as HTMLButtonElement
+  playerControls.applyCustomEventListeners(playButton)
+
   new ViewsController(
     visualization,
     pianoRollPlayer,
@@ -76,6 +79,15 @@ function preparePlayerControls(
 
     playerProgressController.updateProgressIndicatorPosition(newPosition)
     playerProgressController.updateCurrentAreaRectanglePosition()
+
+    // For some reason without this, the player thinks it is still playing
+    // I haven't found a better solution, but with this, we can capture the end of the pianoroll
+    if (newPosition.toFixed(3) === "1.000" && playButton) {
+      player.stop()
+
+      playButton.classList.remove("fadeOut")
+      playButton.classList.add("fadeIn")
+    }
   }
   player.addVisualizer(pianoRollSvgVisualizer)
 }

@@ -3,10 +3,6 @@
   padding: 0 !important;
 }
 
-/* .row {
-  margin: 0 !important;
-} */
-
 .pianoroll-svg-wrapper {
   position: relative;
   border: 3px solid black;
@@ -50,6 +46,7 @@
   transition: transform 0.3s ease; /* Smooth transition for scaling */
   transform-origin: top right;
   user-select: none;
+  z-index: 5;
 }
 
 .pianoroll-link:hover {
@@ -131,16 +128,6 @@
   animation-fill-mode: forwards;
 }
 
-/* @keyframes pulse {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.2);
-  }
-} */
-
 @keyframes fadeIn {
   0% {
     opacity: 0;
@@ -174,36 +161,17 @@
   overflow: hidden;
 }
 
-/* #fullscreen-button:hover svg {
-  animation: pulse 0.3s ease-in-out;
-} */
-
-/* #mute-button {
-  padding: 0.5rem;
-} */
-
-/* #mute-button:hover + .slider-wrapper {
-  margin-right: 4px;
-  width: 64px;
-  visibility: visible;
-} */
-
-/* .slider-wrapper {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 0;
-  transition: all 200ms;
-  visibility: hidden;
-  height: 40px;
-} */
-
-/* .slider-wrapper:hover {
-  margin-right: 4px;
-  width: 64px;
-  visibility: visible;
-} */
+.button.play-button-overlay {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  padding: 4rem;
+  z-index: 2;
+  opacity: 1;
+  animation-duration: 0.1s;
+  animation-timing-function: cubic-bezier(0.4, 0, 1, 1);
+}
 
 midi-player {
   margin: 0;
@@ -230,10 +198,6 @@ midi-player::part(pianoroll-controls-right) {
   justify-content: flex-end;
   align-items: center;
 }
-
-/* midi-player::part(mute-button) {
-  padding: 0.5rem;
-} */
 
 midi-player::part(play-button),
 midi-player::part(mute-button),
@@ -271,9 +235,9 @@ midi-player::part(volume) {
 }
 
 midi-player::part(seek-bar) {
-  /* display: none; */
+  display: none;
   position: absolute;
   margin: 0;
-  top: -8px;
+  top: -0.5rem;
   width: 100%;
 }

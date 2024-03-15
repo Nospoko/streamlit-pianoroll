@@ -175,6 +175,32 @@ class PlayerControls {
     this.playerStyles.innerHTML += styles + externalStyles
   }
 
+  applyCustomEventListeners(playButton: HTMLButtonElement) {
+    playButton.addEventListener("click", () => {
+      if (!this.midiPlayer.noteSequence) return
+      // Here we fire start and stop events, so we use corresponding styles
+      if (this.midiPlayer.playing) {
+        this.midiPlayer.stop()
+        playButton.classList.remove("fadeOut")
+        playButton.classList.add("fadeIn")
+      } else {
+        this.midiPlayer.start()
+        playButton.classList.remove("fadeIn")
+        playButton.classList.add("fadeOut")
+      }
+    })
+    this.playButton.addEventListener("click", () => {
+      // Here, the start and stop events are already fired before this function is called, so we use the opposite styling
+      if (!this.midiPlayer.playing) {
+        playButton.classList.remove("fadeOut")
+        playButton.classList.add("fadeIn")
+      } else {
+        playButton.classList.remove("fadeIn")
+        playButton.classList.add("fadeOut")
+      }
+    })
+  }
+
   private generateControls() {
     this.generateLeftControls()
     this.generateRightControls()

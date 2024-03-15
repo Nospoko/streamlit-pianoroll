@@ -26,6 +26,32 @@
           <img src="color.svg" alt="PianoRoll icon" width="20" height="20" />
         </a>
 
+        <button id="play-button" class="button play-button-overlay">
+          <svg
+            width="64"
+            height="64"
+            viewBox="0 0 64 64"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <g style="mix-blend-mode: multiply" opacity="0.5">
+              <circle cx="32" cy="32" r="32" fill="#60B8C4" />
+            </g>
+            <path
+              d="M32 50.3334C42.1252 50.3334 50.3334 42.1252 50.3334 32C50.3334 21.8748 42.1252 13.6667 32 13.6667C21.8748 13.6667 13.6667 21.8748 13.6667 32C13.6667 42.1252 21.8748 50.3334 32 50.3334Z"
+              fill="#154151"
+            />
+            <path
+              d="M28.3333 24.6667L39.3333 32L28.3333 39.3334V24.6667Z"
+              fill="#F9FAFA"
+              stroke="#F9FAFA"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </button>
+
         <div id="pianoroll-controls" class="controls-wrapper hidden">
           <midi-player id="my-midi-player" sound-font> </midi-player>
 
