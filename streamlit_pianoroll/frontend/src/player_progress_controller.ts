@@ -1,22 +1,23 @@
-import { MidiPlayerElement } from "./types"
+import PianoRoll from "./pianoroll"
+import { MidiPlayerElement, PianoRollSvgVisualizer } from "./types"
 
 class PlayerProgressController {
   midiPlayer: MidiPlayerElement
-  progressLine: SVGLineElement
-  progressBarSVG: SVGElement
-  pianoRoll: any
-  pianoRollSvgVisualizer: any
+  progressIndicator: SVGLineElement
+  progressBarSVG: SVGSVGElement
+  pianoRoll: PianoRoll
+  pianoRollSvgVisualizer: PianoRollSvgVisualizer
   isPlaying: boolean
 
   constructor(
     midiPlayer: MidiPlayerElement,
-    progressLine: SVGLineElement,
-    progressBarSVG: SVGElement,
+    progressIndicator: SVGLineElement,
+    progressBarSVG: SVGSVGElement,
     pianoRoll: any,
     pianoRollSvgVisualizer: any
   ) {
     this.midiPlayer = midiPlayer
-    this.progressLine = progressLine
+    this.progressIndicator = progressIndicator
     this.progressBarSVG = progressBarSVG
     this.pianoRoll = pianoRoll
     this.pianoRollSvgVisualizer = pianoRollSvgVisualizer
@@ -30,11 +31,15 @@ class PlayerProgressController {
       pianoRoll.redrawWithNewTime(currentTime)
       const newPosition = currentTime / this.midiPlayer.duration
 
-      this.progressLine.setAttribute("x1", newPosition.toString())
-      this.progressLine.setAttribute("x2", newPosition.toString())
+      this.updateProgressIndicatorPosition(newPosition)
+
+      this.pianoRoll.updateCurrentAreaRectanglePosition()
     }
 
-    this.pianoRoll.drawProgressTimeline()
+    this.pianoRoll.drawProgressTimeline(
+      this.progressBarSVG,
+      this.progressIndicator
+    )
 
     this.progressBarSVG.addEventListener("mousedown", this.onMouseDown)
     this.progressBarSVG.addEventListener("touchstart", this.onTouchDown)
@@ -94,8 +99,7 @@ class PlayerProgressController {
     const currentTime =
       Math.min(Math.max(calcPos, 0), 1) * this.midiPlayer.duration
 
-    this.progressLine.setAttribute("x1", newPosition.toString())
-    this.progressLine.setAttribute("x2", newPosition.toString())
+    this.updateProgressIndicatorPosition(newPosition)
 
     this.midiPlayer.currentTime = currentTime
 
@@ -106,6 +110,7 @@ class PlayerProgressController {
       return
 
     this.pianoRoll.redrawWithNewTime(currentTime)
+    this.pianoRoll.updateCurrentAreaRectanglePosition()
   }
 
   private startPlayer() {
@@ -116,9 +121,12 @@ class PlayerProgressController {
     )
       return
 
-    setTimeout(() => {
-      this.midiPlayer.start()
-    }, 100)
+    this.midiPlayer.start()
+  }
+
+  private updateProgressIndicatorPosition(newPosition: number) {
+    this.progressIndicator.setAttribute("x1", newPosition.toString())
+    this.progressIndicator.setAttribute("x2", newPosition.toString())
   }
 }
 

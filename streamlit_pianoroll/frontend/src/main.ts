@@ -1,21 +1,12 @@
 import { Streamlit, RenderData } from "streamlit-component-lib"
 
 import PianoRoll from "./pianoroll"
-import { MidiPlayerElement } from "./types"
+import { MidiPlayerElement, PianoRollSvgVisualizer } from "./types"
 import { enhancePianoRollSvg } from "./enhanceVisualizer"
 
 import ViewsController from "./views_controller"
-// import VolumeController from "./volume_controller"
 import PlayerControls from "./player_controls"
 import PlayerProgressController from "./player_progress_controller"
-
-// Not the best solution but couldn't find better one
-// Reference to PianoRoll object is needed to redraw rectangles
-// TODO find better solution and remove types "any"
-const renderRef: { pianoRollRef: any; pianoRollSvgVisualizer: any } = {
-  pianoRollRef: null,
-  pianoRollSvgVisualizer: null,
-}
 
 export function afterContentLoaded() {
   const player = document.getElementById("my-midi-player")! as MidiPlayerElement
@@ -33,13 +24,16 @@ export function afterContentLoaded() {
     "load",
     () => {
       Streamlit.setFrameHeight()
-      preparePlayerControls(player)
     },
     false
   )
 }
 
-function preparePlayerControls(player: MidiPlayerElement) {
+function preparePlayerControls(
+  player: MidiPlayerElement,
+  pianoRoll: PianoRoll,
+  pianoRollSvgVisualizer: PianoRollSvgVisualizer
+) {
   const visualization = document.getElementById(
     "visualization"
   )! as HTMLDivElement
@@ -49,18 +43,9 @@ function preparePlayerControls(player: MidiPlayerElement) {
   const pianoRollButtons = document.getElementById(
     "pianoroll-controls"
   )! as HTMLDivElement
-  // const fullscreenButton = document.getElementById(
-  //   "fullscreen-button"
-  // )! as HTMLButtonElement
   const pianoRollOverlay = document.getElementById(
     "pianoroll-overlay"
   )! as HTMLDivElement
-
-  // const volumeInput = document.getElementById(
-  //   "volume-slider"
-  // ) as HTMLInputElement
-
-  // new VolumeController(player, volumeInput)
 
   const playerControls = new PlayerControls(player)
 
@@ -74,7 +59,7 @@ function preparePlayerControls(player: MidiPlayerElement) {
 
   const progressBar = visualization.querySelector(
     "#progress-bar"
-  )! as SVGElement
+  )! as SVGSVGElement
   const progressLine = visualization.querySelector(
     "#progress-line"
   )! as SVGLineElement
@@ -83,8 +68,8 @@ function preparePlayerControls(player: MidiPlayerElement) {
     player,
     progressLine,
     progressBar,
-    renderRef.pianoRollRef,
-    renderRef.pianoRollSvgVisualizer
+    pianoRoll,
+    pianoRollSvgVisualizer
   )
 }
 
@@ -114,10 +99,6 @@ export function onStreamlitRender(event: Event): void {
   const pianorollSvgVisualizer = enhancePianoRollSvg(pianorollSvg)
   const pianoRoll = new PianoRoll(pianorollSvgVisualizer, note_sequence)
 
-  // Create reference for other functions
-  renderRef.pianoRollRef = pianoRoll
-  renderRef.pianoRollSvgVisualizer = pianorollSvgVisualizer
-
   pianorollSvgVisualizer.reload = () => {}
   pianorollSvgVisualizer.clearActiveNotes = () => {}
   pianorollSvgVisualizer.redraw = (noteDetails) => {
@@ -125,6 +106,8 @@ export function onStreamlitRender(event: Event): void {
     pianoRoll.redrawWithNewTime(currentTime)
   }
   player.addVisualizer(pianorollSvgVisualizer)
+
+  preparePlayerControls(player, pianoRoll, pianorollSvgVisualizer)
 
   // TODO Clean code
   const notes_per_second = 30

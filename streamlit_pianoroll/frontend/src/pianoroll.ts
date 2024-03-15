@@ -425,20 +425,11 @@ class PianoRoll {
     this.keyboardSvg.appendChild(line3)
   }
 
-  drawProgressTimeline() {
-    const progressBar = document.querySelector(
-      "#progress-bar"
-    )! as SVGSVGElement
-    const sequenceSvg = document.createElementNS(
-      "http://www.w3.org/2000/svg",
-      "svg"
-    )
-
-    sequenceSvg.innerHTML = ""
-    sequenceSvg.setAttribute("width", `100%`)
-    sequenceSvg.setAttribute("height", "100%")
-    sequenceSvg.setAttribute("viewBox", `0 0 ${this.note_pages.length} 1`)
-    sequenceSvg.setAttribute("preserveAspectRatio", "none")
+  drawProgressTimeline(
+    progressBar: SVGSVGElement,
+    progressIndicator: SVGLineElement
+  ) {
+    this.drawEmptyProgressTimeline(this.pitchMin, this.pitchMax, progressBar)
 
     for (
       let current_page_idx = 0;
@@ -446,22 +437,44 @@ class PianoRoll {
       current_page_idx++
     ) {
       const sequence = this.note_pages[current_page_idx]
+      const sequenceSvg = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "svg"
+      )
+
+      sequenceSvg.innerHTML = ""
+      sequenceSvg.setAttribute("width", "100%")
+      sequenceSvg.setAttribute("height", "100%")
+      sequenceSvg.setAttribute("viewBox", `0 0 ${this.note_pages.length} 1`)
+      sequenceSvg.setAttribute("preserveAspectRatio", "none")
 
       sequence.forEach((note: Note) => {
         const noteRectangleInfo = this.createNoteRectangle(note)
         sequenceSvg.appendChild(noteRectangleInfo.noteRectangle)
       })
+
+      progressBar.appendChild(sequenceSvg)
     }
 
-    this.drawEmptyProgressTimeline(this.pitchMin, this.pitchMax, progressBar)
+    const currentAreaRectangle = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "rect"
+    )
+    currentAreaRectangle.id = "current-area-rectangle"
+    currentAreaRectangle.setAttribute("x", "0")
+    currentAreaRectangle.setAttribute("y", "0")
+    currentAreaRectangle.setAttribute(
+      "width",
+      `${100 / this.note_pages.length}%`
+    )
+    currentAreaRectangle.setAttribute("height", "100%")
+    currentAreaRectangle.setAttribute("stroke", "grey")
+    currentAreaRectangle.setAttribute("stroke-width", "0.002")
+    currentAreaRectangle.setAttribute("fill", "WhiteSmoke")
+    currentAreaRectangle.setAttribute("fill-opacity", "0.5")
 
-    progressBar.appendChild(sequenceSvg)
-
-    const progressLine = document.querySelector(
-      "#progress-line"
-    )! as SVGSVGElement
-
-    progressBar.appendChild(progressLine)
+    progressBar.appendChild(currentAreaRectangle)
+    progressBar.appendChild(progressIndicator)
   }
 
   drawEmptyProgressTimeline(
@@ -482,6 +495,17 @@ class PianoRoll {
       // Draw key separator lines
       this.drawKeySeparator(y + height, it % 12 === 0, progressBar)
     }
+  }
+
+  updateCurrentAreaRectanglePosition() {
+    const currentAreaRectangle = document.querySelector(
+      "#current-area-rectangle"
+    ) as SVGRectElement
+
+    currentAreaRectangle.setAttribute(
+      "x",
+      `${(100 / this.note_pages.length) * this.current_page_idx}%`
+    )
   }
 }
 
