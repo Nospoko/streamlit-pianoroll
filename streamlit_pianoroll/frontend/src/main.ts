@@ -32,7 +32,8 @@ export function afterContentLoaded() {
 function preparePlayerControls(
   player: MidiPlayerElement,
   pianoRoll: PianoRoll,
-  pianoRollSvgVisualizer: PianoRollSvgVisualizer
+  pianoRollSvgVisualizer: PianoRollSvgVisualizer,
+  showBirdView: boolean
 ) {
   const visualization = document.getElementById(
     "visualization"
@@ -60,36 +61,42 @@ function preparePlayerControls(
     pianoRollOverlay
   )
 
-  const progressBar = visualization.querySelector(
-    "#progress-bar"
-  )! as SVGSVGElement
+  if (showBirdView) {
+    const playerProgressController = new PlayerProgressController(
+      player,
+      pianoRoll,
+      visualization
+    )
 
-  const playerProgressController = new PlayerProgressController(
-    player,
-    progressBar,
-    pianoRoll
-  )
+    pianoRollSvgVisualizer.reload = () => {}
+    pianoRollSvgVisualizer.clearActiveNotes = () => {}
+    pianoRollSvgVisualizer.redraw = (noteDetails: any) => {
+      const currentTime = noteDetails.startTime
+      pianoRoll.redrawWithNewTime(currentTime)
+      const newPosition = currentTime / player.duration
 
-  pianoRollSvgVisualizer.reload = () => {}
-  pianoRollSvgVisualizer.clearActiveNotes = () => {}
-  pianoRollSvgVisualizer.redraw = (noteDetails: any) => {
-    const currentTime = noteDetails.startTime
-    pianoRoll.redrawWithNewTime(currentTime)
-    const newPosition = currentTime / player.duration
+      playerProgressController.updateProgressIndicatorPosition(newPosition)
+      playerProgressController.updateCurrentAreaRectanglePosition()
 
-    playerProgressController.updateProgressIndicatorPosition(newPosition)
-    playerProgressController.updateCurrentAreaRectanglePosition()
+      // For some reason without this, the player thinks it is still playing
+      // I haven't found a better solution, but with this, we can capture the end of the pianoroll
+      // if (newPosition.toFixed(3) === "1.000" && playButton) {
+      //   player.stop()
 
-    // For some reason without this, the player thinks it is still playing
-    // I haven't found a better solution, but with this, we can capture the end of the pianoroll
-    if (newPosition.toFixed(3) === "1.000" && playButton) {
-      player.stop()
-
-      playButton.classList.remove("fadeOut")
-      playButton.classList.add("fadeIn")
+      //   playButton.classList.remove("fadeOut")
+      //   playButton.classList.add("fadeIn")
+      // }
     }
+    player.addVisualizer(pianoRollSvgVisualizer)
+  } else {
+    pianoRollSvgVisualizer.reload = () => {}
+    pianoRollSvgVisualizer.clearActiveNotes = () => {}
+    pianoRollSvgVisualizer.redraw = (noteDetails) => {
+      const currentTime = noteDetails.startTime
+      pianoRoll.redrawWithNewTime(currentTime)
+    }
+    player.addVisualizer(pianoRollSvgVisualizer)
   }
-  player.addVisualizer(pianoRollSvgVisualizer)
 }
 
 export function onStreamlitRender(event: Event): void {
@@ -118,7 +125,9 @@ export function onStreamlitRender(event: Event): void {
   const pianorollSvgVisualizer = enhancePianoRollSvg(pianorollSvg)
   const pianoRoll = new PianoRoll(pianorollSvgVisualizer, note_sequence)
 
-  preparePlayerControls(player, pianoRoll, pianorollSvgVisualizer)
+  const showBirdView = data.args["show_bird_view"]
+
+  preparePlayerControls(player, pianoRoll, pianorollSvgVisualizer, showBirdView)
 
   // TODO Clean code
   const notes_per_second = 30

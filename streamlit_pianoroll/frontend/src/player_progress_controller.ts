@@ -8,17 +8,22 @@ class PlayerProgressController {
   currentAreaRectangle: SVGRectElement
   pianoRoll: PianoRoll
   isPlaying: boolean
+  parent: HTMLDivElement
 
   constructor(
     midiPlayer: MidiPlayerElement,
-    progressBarSVG: SVGSVGElement,
-    pianoRoll: any
+    pianoRoll: PianoRoll,
+    parent: HTMLDivElement
   ) {
     this.midiPlayer = midiPlayer
-    this.progressBarSVG = progressBarSVG
     this.pianoRoll = pianoRoll
+    this.parent = parent
     this.isPlaying = this.midiPlayer.playing
 
+    this.progressBarSVG = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "svg"
+    )
     this.progressIndicator = document.createElementNS(
       "http://www.w3.org/2000/svg",
       "line"
@@ -28,7 +33,7 @@ class PlayerProgressController {
       "rect"
     )
 
-    this.drawProgressTimeline()
+    this.drawEmptyProgressTimeline()
     this.drawCurrentAreaRectangle()
     this.drawProgressIndicator()
 
@@ -40,7 +45,7 @@ class PlayerProgressController {
     this.setNewPosition(e.clientX)
 
     this.isPlaying = this.midiPlayer.playing
-    this.midiPlayer.stop()
+    if (this.isPlaying) this.midiPlayer.stop()
 
     document.addEventListener("mousemove", this.onMouseMove)
     document.addEventListener("mouseup", this.onMouseUp)
@@ -51,7 +56,7 @@ class PlayerProgressController {
     this.setNewPosition(touch.clientX)
 
     this.isPlaying = this.midiPlayer.playing
-    this.midiPlayer.stop()
+    if (this.isPlaying) this.midiPlayer.stop()
 
     document.addEventListener("touchmove", this.onTouchMove)
     document.addEventListener("touchend", this.onTouchEnd)
@@ -187,6 +192,22 @@ class PlayerProgressController {
     const percentage = 100 / this.pianoRoll.note_pages.length
     const offset = percentage * this.pianoRoll.current_page_idx
     this.currentAreaRectangle.setAttribute("x", `${offset}%`)
+  }
+
+  private drawEmptyProgressTimeline() {
+    const progressBarWrapper = document.createElement("div")
+    progressBarWrapper.classList.add("pianoroll-progress-bar-wrapper")
+
+    this.progressBarSVG.id = "progress-bar"
+    this.progressBarSVG.classList.add("pianoroll-progress-bar")
+    this.progressBarSVG.setAttribute("width", "100%")
+    this.progressBarSVG.setAttribute("viewBox", "0 0 1 1")
+    this.progressBarSVG.setAttribute("preserveAspectRatio", "none")
+
+    progressBarWrapper.appendChild(this.progressBarSVG)
+    this.parent.appendChild(progressBarWrapper)
+
+    this.drawProgressTimeline()
   }
 }
 

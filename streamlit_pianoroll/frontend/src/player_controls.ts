@@ -175,29 +175,21 @@ class PlayerControls {
     this.playerStyles.innerHTML += styles + externalStyles
   }
 
-  applyCustomEventListeners(playButton: HTMLButtonElement) {
-    playButton.addEventListener("click", () => {
-      if (!this.midiPlayer.noteSequence) return
-      // Here we fire start and stop events, so we use corresponding styles
-      if (this.midiPlayer.playing) {
-        this.midiPlayer.stop()
-        playButton.classList.remove("fadeOut")
-        playButton.classList.add("fadeIn")
-      } else {
-        this.midiPlayer.start()
-        playButton.classList.remove("fadeIn")
-        playButton.classList.add("fadeOut")
-      }
+  applyCustomEventListeners(centralPlayButton: HTMLButtonElement) {
+    this.midiPlayer.addEventListener("stop", () => {
+      centralPlayButton.classList.remove("fadeOut")
+      centralPlayButton.classList.add("fadeIn")
     })
-    this.playButton.addEventListener("click", () => {
-      // Here, the start and stop events are already fired before this function is called, so we use the opposite styling
-      if (!this.midiPlayer.playing) {
-        playButton.classList.remove("fadeOut")
-        playButton.classList.add("fadeIn")
-      } else {
-        playButton.classList.remove("fadeIn")
-        playButton.classList.add("fadeOut")
-      }
+
+    this.midiPlayer.addEventListener("start", () => {
+      centralPlayButton.classList.remove("fadeIn")
+      centralPlayButton.classList.add("fadeOut")
+    })
+
+    centralPlayButton.addEventListener("click", () => {
+      if (!this.midiPlayer.noteSequence) return
+      if (this.midiPlayer.playing) this.midiPlayer.stop()
+      else this.midiPlayer.start()
     })
   }
 
@@ -219,12 +211,10 @@ class PlayerControls {
     )
 
     this.controlsLeft.appendChild(this.timeElement)
-    // this.controlsElement.appendChild(this.controlsRight)
   }
 
   private generateLeftControls() {
     // Create left controls part
-    // this.controlsLeft.className = "pianoroll-controls-left"
     this.controlsLeft.setAttribute("part", "pianoroll-controls-left")
 
     // Replace play icon
@@ -312,10 +302,9 @@ class PlayerControls {
     errorSVG.appendChild(playButtonErrorIcon)
 
     // Create mute button with volume control input
-    this.muteButton.className = "mute-button"
+    this.muteButton.classList.add("mute-button")
     this.muteButton.setAttribute("aria-label", "Mute")
     this.muteButton.setAttribute("title", "Mute")
-    // this.muteButton.className = "button"
     this.muteButton.setAttribute("part", "mute-button")
 
     const muteButtonIcon = document.createElementNS(
@@ -341,7 +330,7 @@ class PlayerControls {
     muteButtonIcon.appendChild(muteButtonPath)
     this.muteButton.appendChild(muteButtonIcon)
 
-    this.sliderWrapper.className = "slider-wrapper"
+    this.sliderWrapper.classList.add("slider-wrapper")
     this.sliderWrapper.setAttribute("part", "slider-wrapper")
 
     this.volumeSlider.setAttribute("part", "volume")
@@ -356,8 +345,7 @@ class PlayerControls {
     this.volumeSlider.setAttribute("min", "-50")
     this.volumeSlider.setAttribute("max", "5")
     this.volumeSlider.setAttribute("value", "-3")
-    // this.volumeSlider.id = "volume-slider"
-    this.volumeSlider.className = "volume-slider"
+    this.volumeSlider.classList.add("volume-slider")
     this.volumeSlider.setAttribute("autocomplete", "off")
 
     this.sliderWrapper.appendChild(this.volumeSlider)
@@ -369,12 +357,10 @@ class PlayerControls {
 
   private generateRightControls() {
     // Create right controls part
-    // this.controlsRight.className = "pianoroll-controls-right"
     this.controlsRight.setAttribute("part", "pianoroll-controls-right")
 
     // Create fullscreen button
-    // this.fullscreenButton.id = "fullscreen-button"
-    this.fullscreenButton.className = "button fullscreen-button"
+    this.fullscreenButton.classList.add("button", "fullscreen-button")
     this.fullscreenButton.setAttribute("part", "fullscreen-button")
     this.fullscreenButton.setAttribute("title", "Full screen")
 

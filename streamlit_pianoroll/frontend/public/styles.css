@@ -235,7 +235,7 @@ midi-player::part(volume) {
 }
 
 midi-player::part(seek-bar) {
-  display: none;
+  /* display: none; */
   position: absolute;
   margin: 0;
   top: -0.5rem;

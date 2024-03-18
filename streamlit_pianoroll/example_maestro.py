@@ -1,9 +1,10 @@
 import json
+
 import fortepyan as ff
 import streamlit as st
-from datasets import load_dataset, Dataset
-from streamlit_pianoroll import from_fortepyan
+from datasets import Dataset, load_dataset
 
+from streamlit_pianoroll import from_fortepyan
 
 st.subheader("Maestro Piano Rolls!")
 
@@ -18,7 +19,7 @@ def main():
         value=9,
     )
     piece = ff.MidiPiece.from_huggingface(dataset[idx])
-    from_fortepyan(piece)
+    from_fortepyan(piece, show_bird_view=False)
 
     source = json.loads(dataset[idx]["source"])
     st.write(source)

@@ -46,7 +46,7 @@ else:
 # `declare_component` and call it done. The wrapper allows us to customize
 # our component's API: we can pre-process its input args, post-process its
 # output value, and add a docstring for users.
-def pianoroll_player(midi_data: dict, key=None):
+def pianoroll_player(midi_data: dict, show_bird_view, key=None):
     """Create a new instance of "pianoroll".
 
     Parameters
@@ -68,22 +68,14 @@ def pianoroll_player(midi_data: dict, key=None):
     #
     # "default" is a special argument that specifies the initial return
     # value of the component before the user has interacted with it.
-    component_value = _component_func(
-        key=key,
-        default=0,
-        midi_data=midi_data,
-    )
+    component_value = _component_func(key=key, default=0, midi_data=midi_data, show_bird_view=show_bird_view)
 
     # We could modify the value returned from the component if we wanted.
     # There's no need to do this in our simple example - but it's an option.
     return component_value
 
 
-def from_fortepyan(
-    piece: MidiPiece,
-    secondary_piece: MidiPiece = None,
-    key=None,
-):
+def from_fortepyan(piece: MidiPiece, secondary_piece: MidiPiece = None, key=None, show_bird_view=True):
     df = piece.df.copy()
 
     if secondary_piece is not None:
@@ -106,5 +98,5 @@ def from_fortepyan(
         "totalTime": df.endTime.max(),
     }
 
-    component_value = pianoroll_player(midi_data=midi_data, key=key)
+    component_value = pianoroll_player(midi_data=midi_data, key=key, show_bird_view=show_bird_view)
     return component_value
