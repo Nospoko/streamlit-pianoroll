@@ -19,7 +19,12 @@ def main():
         value=9,
     )
     piece = ff.MidiPiece.from_huggingface(dataset[idx])
-    from_fortepyan(piece, show_bird_view=False)
+
+    show_bird_view = st.toggle(
+        label="Show zoom out piano roll",
+        value=True,
+    )
+    from_fortepyan(piece, show_bird_view=show_bird_view)
 
     source = json.loads(dataset[idx]["source"])
     st.write(source)
