@@ -48,10 +48,13 @@ function preparePlayerControls(
     "pianoroll-overlay"
   )! as HTMLDivElement
 
-  const playerControls = new PlayerControls(player)
+  const playerControls = new PlayerControls(player, pianoRoll)
 
   const playButton = document.getElementById("play-button") as HTMLButtonElement
-  playerControls.applyCustomEventListeners(playButton)
+  player.addEventListener("load", () => {
+    playerControls.generateCustomSeekBar()
+    playerControls.applyCustomEventListeners(playButton)
+  })
 
   new ViewsController(
     visualization,
@@ -63,7 +66,7 @@ function preparePlayerControls(
 
   if (showBirdView) {
     const playerProgressController = new PlayerProgressController(
-      player,
+      playerControls,
       pianoRoll,
       visualization
     )
@@ -75,17 +78,9 @@ function preparePlayerControls(
       pianoRoll.redrawWithNewTime(currentTime)
       const newPosition = currentTime / player.duration
 
+      playerControls.updateSeekBarPosition(currentTime)
       playerProgressController.updateProgressIndicatorPosition(newPosition)
       playerProgressController.updateCurrentAreaRectanglePosition()
-
-      // For some reason without this, the player thinks it is still playing
-      // I haven't found a better solution, but with this, we can capture the end of the pianoroll
-      // if (newPosition.toFixed(3) === "1.000" && playButton) {
-      //   player.stop()
-
-      //   playButton.classList.remove("fadeOut")
-      //   playButton.classList.add("fadeIn")
-      // }
     }
     player.addVisualizer(pianoRollSvgVisualizer)
   } else {
@@ -94,7 +89,10 @@ function preparePlayerControls(
     pianoRollSvgVisualizer.redraw = (noteDetails) => {
       const currentTime = noteDetails.startTime
       pianoRoll.redrawWithNewTime(currentTime)
+
+      playerControls.updateSeekBarPosition(currentTime)
     }
+
     player.addVisualizer(pianoRollSvgVisualizer)
   }
 }

@@ -1,3 +1,5 @@
+import PianoRoll from "./pianoroll"
+import PlayerProgressController from "./player_progress_controller"
 import { MidiPlayerElement, VolumeControl } from "./types"
 
 import VolumeController from "./volume_controller"
@@ -14,9 +16,14 @@ class PlayerControls {
   controlsElement: HTMLDivElement
   playButton: HTMLButtonElement
   timeElement: HTMLDivElement
+  seekBarElement: HTMLInputElement
   volumeControl: VolumeControl
+  isPlaying: boolean
+  playingFlag: boolean
+  pianoRoll: PianoRoll
+  playerProgress: PlayerProgressController | null
 
-  constructor(midiPlayer: MidiPlayerElement) {
+  constructor(midiPlayer: MidiPlayerElement, pianoRoll: PianoRoll) {
     this.midiPlayer = midiPlayer
     this.controlsLeft = document.createElement("div")
     this.controlsRight = document.createElement("div")
@@ -33,9 +40,15 @@ class PlayerControls {
       '[part="play-button"]'
     )!
     this.timeElement = this.controlsElement.querySelector('[part="time"]')!
+    this.seekBarElement = document.createElement("input")
+    this.isPlaying = this.midiPlayer.playing
+    this.playingFlag = false
+    this.pianoRoll = pianoRoll
+    this.playerProgress = null
 
     this.generateControls()
     this.applyCustomStyling()
+    this.applyCustomSeekBarEventListeners()
 
     this.volumeControl = new VolumeController(
       this.midiPlayer,
@@ -50,6 +63,7 @@ class PlayerControls {
       margin: 0;
     }
 
+    /* Volume slider styling */
     input[type="range"].volume-slider {
       appearance: none;
       width: 100%;
@@ -119,6 +133,104 @@ class PlayerControls {
       background: transparent;
     }
 
+    /* SeekBar styling */
+    input[type="range"].seek-bar {
+      appearance: none;
+      width: 100%;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 3px;
+      background-image: linear-gradient(#E8A03E, #E8A03E);
+      background-size: 0% 100%;
+      background-repeat: no-repeat;
+      cursor: pointer;
+    }
+
+    [dir="rtl"] input[type="range"].seek-bar {
+      background: #E8A03E;
+      background-image: linear-gradient(#E8A03E, #E8A03E);
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+    }
+
+    input[type="range"].seek-bar:hover {
+      height: 5px;
+    }
+
+    /* Input Thumb */
+    input[type="range"].seek-bar:hover::-webkit-slider-thumb {
+      height: 12px;
+      width: 12px;
+      visibility: visible;
+      transition: all 200ms;
+    }
+
+    input[type="range"].seek-bar:hover::-moz-range-thumb {
+      height: 12px;
+      width: 12px;
+      visibility: visible;
+      transition: all 200ms;
+    }
+
+    input[type="range"].seek-bar:hover::-ms-thumb {
+      height: 12px;
+      width: 12px;
+      visibility: visible;
+      transition: all 200ms;
+    }
+
+    input[type="range"].seek-bar::-webkit-slider-thumb {
+      appearance: none;
+      height: 0;
+      width: 0;
+      border-radius: 50%;
+      background: #E8A03E;
+      box-shadow: 0 0 2px 0 #505050;
+      visibility: hidden;
+    }
+
+    input[type="range"].seek-bar::-moz-range-thumb {
+      appearance: none;
+      height: 0;
+      width: 0;
+      border-radius: 50%;
+      background: #E8A03E;
+      box-shadow: 0 0 2px 0 #505050;
+      visibility: hidden;
+    }
+
+    input[type="range"].seek-bar::-ms-thumb {
+      appearance: none;
+      height: 0;
+      width: 0;
+      border-radius: 50%;
+      background: #E8A03E;
+      box-shadow: 0 0 2px 0 #505050;
+      visibility: hidden;
+    }
+
+    /* Input Track */
+    input[type="range"].seek-bar::-webkit-slider-runnable-track {
+      appearance: none;
+      box-shadow: none;
+      border: none;
+      background: transparent;
+    }
+
+    input[type="range"].seek-bar::-moz-range-track {
+      appearance: none;
+      box-shadow: none;
+      border: none;
+      background: transparent;
+    }
+
+    input[type="range"].seek-bar::-ms-track {
+      appearance: none;
+      box-shadow: none;
+      border: none;
+      background: transparent;
+    }
+
     controls .button {
       height: 2.5rem;
       width: 2.5rem;
@@ -176,6 +288,8 @@ class PlayerControls {
   }
 
   applyCustomEventListeners(centralPlayButton: HTMLButtonElement) {
+    centralPlayButton.classList.remove("hidden")
+
     this.midiPlayer.addEventListener("stop", () => {
       centralPlayButton.classList.remove("fadeOut")
       centralPlayButton.classList.add("fadeIn")
@@ -184,12 +298,53 @@ class PlayerControls {
     this.midiPlayer.addEventListener("start", () => {
       centralPlayButton.classList.remove("fadeIn")
       centralPlayButton.classList.add("fadeOut")
+
+      this.isPlaying = true
     })
 
     centralPlayButton.addEventListener("click", () => {
       if (!this.midiPlayer.noteSequence) return
       if (this.midiPlayer.playing) this.midiPlayer.stop()
       else this.midiPlayer.start()
+    })
+  }
+
+  applyCustomSeekBarEventListeners() {
+    this.seekBarElement.addEventListener("input", (e) => {
+      const time = (e.target as HTMLInputElement).value
+
+      this.midiPlayer.currentTime = +time
+      this.updateSeekBarPosition(+time)
+
+      if (!this.playingFlag) {
+        this.isPlaying = this.midiPlayer.playing
+      }
+
+      if (this.midiPlayer.player && this.midiPlayer.playing) {
+        this.midiPlayer.stop()
+      }
+
+      this.pianoRoll.redrawWithNewTime(+time)
+
+      if (this.playerProgress) {
+        this.playerProgress.updateCurrentAreaRectanglePosition()
+        this.playerProgress.updateProgressIndicatorPosition(
+          this.midiPlayer.currentTime / this.midiPlayer.duration
+        )
+      }
+
+      this.playingFlag = true
+    })
+
+    this.seekBarElement.addEventListener("change", () => {
+      if (
+        this.isPlaying &&
+        (+this.seekBarElement.value).toFixed(6) !==
+          this.midiPlayer.duration.toFixed(6)
+      ) {
+        this.midiPlayer.start()
+      }
+      this.playingFlag = false
     })
   }
 
@@ -389,6 +544,35 @@ class PlayerControls {
 
     // Append fullscreen button to right controls
     this.controlsRight.appendChild(this.fullscreenButton)
+  }
+
+  generateCustomSeekBar() {
+    this.seekBarElement.setAttribute("type", "range")
+    this.seekBarElement.setAttribute("min", "0")
+    this.seekBarElement.max = this.midiPlayer.duration.toString()
+    this.seekBarElement.setAttribute("value", "0")
+    this.seekBarElement.setAttribute("step", "any")
+    this.seekBarElement.classList.add("seek-bar")
+    this.seekBarElement.setAttribute("part", "custom-seek-bar")
+    this.controlsElement.appendChild(this.seekBarElement)
+  }
+
+  updateSeekBarPosition(newPosition: number) {
+    const min = parseFloat(this.seekBarElement.min)
+    const max = parseFloat(this.seekBarElement.max)
+    const value = parseFloat(this.seekBarElement.value)
+    const percentage = ((value - min) * 100) / (max - min)
+    this.setVolumePercentage(percentage)
+
+    this.seekBarElement.value = newPosition.toString()
+  }
+
+  createPlayerProgressRef(playerProgress: PlayerProgressController) {
+    this.playerProgress = playerProgress
+  }
+
+  private setVolumePercentage(percentage: number) {
+    this.seekBarElement.style.backgroundSize = `${percentage}% 100%`
   }
 }
 

@@ -18,8 +18,6 @@ class VolumeController {
     this.volumeInput = volumeInput
     this.muteButton = muteButton
     this.volumeState = "unmute"
-    // this.volumePercentage = 85
-    // this.volumeValue = -3
     this.isRTL = document.documentElement.dir === "rtl"
 
     const min = parseFloat(this.volumeInput.min)
@@ -78,7 +76,7 @@ class VolumeController {
   }
 
   private setVolumePercentage(element: HTMLInputElement, percentage: number) {
-    element.style.backgroundSize = `${Math.floor(percentage)}% 100%`
+    element.style.backgroundSize = `${percentage}% 100%`
   }
 
   private handleMuteButton() {
