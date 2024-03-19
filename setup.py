@@ -7,13 +7,13 @@ long_description = (this_directory / "README.md").read_text()
 
 setuptools.setup(
     name="streamlit-pianoroll",
-    version="0.6.2",
+    version="0.7.0",
     author="Bathilda Bagshot",
     author_email="tomasz@pianoroll.io",
     description="Streamlit component that allows you to play piano",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="",
+    url="https://github.com/Nospoko/streamlit-pianoroll",
     packages=setuptools.find_packages(),
     include_package_data=True,
     classifiers=[],
