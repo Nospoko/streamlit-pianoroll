@@ -162,10 +162,8 @@ export function onStreamlitRender(event: Event): void {
 function updateProgressSvgHeight() {
   const pianoRollSvgVisualizer = document.querySelector(
     "#my-svg"
-  )! as MidiPlayerElement
-  const progressBarSVG = document.querySelector(
-    "#progress-bar"
-  )! as MidiPlayerElement
+  )! as SVGElement
+  const progressBarSVG = document.querySelector("#progress-bar")! as SVGElement
 
   if (!pianoRollSvgVisualizer || !progressBarSVG) return
 
