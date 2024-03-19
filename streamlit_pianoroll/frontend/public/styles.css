@@ -20,7 +20,7 @@
 .pianoroll-progress-bar {
   background-color: whitesmoke;
   width: 100%;
-  height: 6.25rem;
+  /* height: 6.25rem; */
 }
 
 .pianoroll-svg {

@@ -71,6 +71,8 @@ function preparePlayerControls(
       visualization
     )
 
+    updateProgressSvgHeight()
+
     pianoRollSvgVisualizer.reload = () => {}
     pianoRollSvgVisualizer.clearActiveNotes = () => {}
     pianoRollSvgVisualizer.redraw = (noteDetails: any) => {
@@ -98,6 +100,7 @@ function preparePlayerControls(
 }
 
 export function onStreamlitRender(event: Event): void {
+  updateProgressSvgHeight()
   // Get the RenderData from the event
   const data = (event as CustomEvent<RenderData>).detail
 
@@ -154,4 +157,26 @@ export function onStreamlitRender(event: Event): void {
   }
   // *noteSequence* in the player is a more complex structure than a sequence of notes
   player.noteSequence = midi_data
+}
+
+function updateProgressSvgHeight() {
+  const pianoRollSvgVisualizer = document.querySelector(
+    "#my-svg"
+  )! as MidiPlayerElement
+  const progressBarSVG = document.querySelector(
+    "#progress-bar"
+  )! as MidiPlayerElement
+
+  if (!pianoRollSvgVisualizer || !progressBarSVG) return
+
+  const percentage = 16.5
+  const minHeight = 48 // 3rem if font-size is 16px
+  const maxHeight = 80 // 5rem if font-size is 16px
+
+  let progressHeight =
+    (percentage / 100) * pianoRollSvgVisualizer.getBoundingClientRect().height
+
+  progressHeight = Math.max(minHeight, Math.min(progressHeight, maxHeight))
+  console.log(progressHeight.toFixed(0))
+  progressBarSVG.setAttribute("height", `${progressHeight.toFixed(0)}px`)
 }
