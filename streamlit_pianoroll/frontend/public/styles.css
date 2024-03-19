@@ -3,15 +3,24 @@
   padding: 0 !important;
 }
 
-.row {
-  margin: 0 !important;
-}
-
 .pianoroll-svg-wrapper {
   position: relative;
   border: 3px solid black;
   padding: 0px !important;
   background-color: #f0f0f0;
+  height: 100%;
+}
+
+.pianoroll-progress-bar-wrapper {
+  border: 3px solid black;
+  border-top: none;
+  cursor: pointer;
+}
+
+.pianoroll-progress-bar {
+  background-color: whitesmoke;
+  width: 100%;
+  /* height: 6.25rem; */
 }
 
 .pianoroll-svg {
@@ -28,22 +37,17 @@
   transition-duration: 0.1s; /* Faster transition when activated */
 }
 
-midi-player::part(control-panel) {
-  background: #f0f0f0;
-  color: black;
-  border-radius: 8px;
-}
-
 .pianoroll-link {
   display: flex;
   position: absolute;
-  top: 4px;
-  right: 4px;
-  width: 20px; /* Initial width */
-  height: 20px; /* Initial height */
+  top: 0.25rem;
+  right: 0.25rem;
+  width: 1.25rem; /* Initial width */
+  height: 1.25rem; /* Initial height */
   transition: transform 0.3s ease; /* Smooth transition for scaling */
   transform-origin: top right;
   user-select: none;
+  z-index: 5;
 }
 
 .pianoroll-link:hover {
@@ -56,156 +60,11 @@ midi-player::part(control-panel) {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 4px;
+  gap: 0.25rem;
   bottom: 0;
   z-index: 100;
-  /* pointer-events: none; */
   opacity: 0;
-  padding: 0 4px;
-}
-
-.pianoroll-controls-left {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-}
-
-.pianoroll-controls-right {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-}
-
-.button {
-  height: 2.5rem;
-  width: 2.5rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 0;
-  padding: 0.25rem;
-  appearance: none;
-  border: none;
-  cursor: pointer;
-  color: #ffffff;
-  background-color: transparent;
-  overflow: hidden;
-  pointer-events: all;
-}
-
-#fullscreen-button:hover svg {
-  animation: pulse 0.3s ease-in-out;
-}
-
-#mute-button {
-  padding: 0.5rem;
-}
-
-.control-panel {
-  height: 60px;
-  display: flex !important;
-  justify-content: center;
-  align-items: center;
-}
-
-.slider-wrapper {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-input {
-  display: inline-block;
-  vertical-align: middle;
-}
-
-input[type="range"] {
-  appearance: none;
-  width: 100%;
-  height: 3px;
-  background: rgba(255, 255, 255, 0.4);
-  border-radius: 3px;
-  background-image: linear-gradient(#ffffff, #ffffff);
-  background-size: 85% 100%;
-  background-repeat: no-repeat;
-  cursor: pointer;
-}
-
-[dir="rtl"] input[type="range"] {
-  background: #ffffff;
-  background-image: linear-gradient(#ffffff, #ffffff);
-  background-size: 15% 100%;
-  background-repeat: no-repeat;
-}
-
-/* Input Thumb */
-input[type="range"]::-webkit-slider-thumb {
-  appearance: none;
-  height: 12px;
-  width: 12px;
-  border-radius: 50%;
-  background: #ffffff;
-  box-shadow: 0 0 2px 0 #505050;
-}
-
-input[type="range"]::-moz-range-thumb {
-  appearance: none;
-  height: 12px;
-  width: 12px;
-  border-radius: 50%;
-  background: #ffffff;
-  box-shadow: 0 0 2px 0 #505050;
-}
-
-input[type="range"]::-ms-thumb {
-  appearance: none;
-  height: 12px;
-  width: 12px;
-  border-radius: 50%;
-  background: #ffffff;
-  box-shadow: 0 0 2px 0 #505050;
-}
-
-/* Input Track */
-input[type="range"]::-webkit-slider-runnable-track {
-  appearance: none;
-  box-shadow: none;
-  border: none;
-  background: transparent;
-}
-
-input[type="range"]::-moz-range-track {
-  appearance: none;
-  box-shadow: none;
-  border: none;
-  background: transparent;
-}
-
-input[type="range"]::-ms-track {
-  appearance: none;
-  box-shadow: none;
-  border: none;
-  background: transparent;
-}
-
-.slider-wrapper {
-  width: 0;
-  transition: all 200ms;
-  visibility: hidden;
-  height: 40px;
-}
-
-#mute-button:hover + .slider-wrapper {
-  margin-right: 4px;
-  width: 64px;
-  visibility: visible;
-}
-
-.slider-wrapper:hover {
-  margin-right: 4px;
-  width: 64px;
-  visibility: visible;
+  padding: 0 0.25rem;
 }
 
 .theater-mode {
@@ -239,8 +98,8 @@ input[type="range"]::-ms-track {
   position: absolute;
   bottom: 0;
   height: 100%;
-  max-height: 100px;
-  min-height: 60px;
+  max-height: 6.25rem;
+  min-height: 3.75rem;
   z-index: 10;
   width: 100%;
   pointer-events: none;
@@ -257,7 +116,7 @@ input[type="range"]::-ms-track {
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }
 
 .fadeIn {
@@ -268,16 +127,6 @@ input[type="range"]::-ms-track {
 .fadeOut {
   animation-name: fadeOut;
   animation-fill-mode: forwards;
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.2);
-  }
 }
 
 @keyframes fadeIn {
@@ -296,4 +145,113 @@ input[type="range"]::-ms-track {
   100% {
     opacity: 0;
   }
+}
+
+.button {
+  height: 2.5rem;
+  width: 2.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  padding: 0.25rem;
+  appearance: none;
+  border: none;
+  cursor: pointer;
+  background-color: transparent;
+  overflow: hidden;
+}
+
+.button.play-button-overlay {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  padding: 4rem;
+  z-index: 2;
+  opacity: 1;
+  animation-duration: 0.1s;
+  animation-timing-function: cubic-bezier(0.4, 0, 1, 1);
+}
+
+midi-player {
+  margin: 0;
+  width: 100%;
+}
+
+midi-player::part(control-panel) {
+  padding: 0;
+  background: transparent;
+  color: #ddd;
+  border-radius: 0;
+  overflow: visible;
+}
+
+midi-player::part(pianoroll-controls-left) {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex: 1;
+}
+
+midi-player::part(pianoroll-controls-right) {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+midi-player::part(play-button),
+midi-player::part(mute-button),
+midi-player::part(fullscreen-button) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  height: 2.5rem;
+  width: 2.5rem;
+  color: #eee;
+  transition: color 150ms ease;
+}
+
+midi-player::part(play-button):hover,
+midi-player::part(mute-button):hover,
+midi-player::part(fullscreen-button):hover {
+  color: #fff;
+  background: none;
+}
+
+midi-player::part(time) {
+  height: 100%;
+  padding: 0 0.375rem;
+  white-space: nowrap;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: normal;
+}
+
+midi-player::part(volume) {
+  margin: 0;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+midi-player::part(seek-bar) {
+  display: none;
+  pointer-events: none;
+  user-select: none;
+  position: absolute;
+  margin: 0;
+  top: -0.5rem;
+  width: 100%;
+}
+
+midi-player::part(custom-seek-bar) {
+  position: absolute;
+  margin: 0;
+  top: -3px;
+  width: 100%;
+}
+
+midi-player::part(custom-seek-bar):hover {
+  top: -4px;
 }

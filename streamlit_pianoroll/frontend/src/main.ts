@@ -1,11 +1,12 @@
 import { Streamlit, RenderData } from "streamlit-component-lib"
 
 import PianoRoll from "./pianoroll"
-import { MidiPlayerElement } from "./types"
+import { MidiPlayerElement, PianoRollSvgVisualizer } from "./types"
 import { enhancePianoRollSvg } from "./enhanceVisualizer"
 
 import ViewsController from "./views_controller"
-import VolumeController from "./volume_controller"
+import PlayerControls from "./player_controls"
+import PlayerProgressController from "./player_progress_controller"
 
 export function afterContentLoaded() {
   const player = document.getElementById("my-midi-player")! as MidiPlayerElement
@@ -26,7 +27,14 @@ export function afterContentLoaded() {
     },
     false
   )
+}
 
+function preparePlayerControls(
+  player: MidiPlayerElement,
+  pianoRoll: PianoRoll,
+  pianoRollSvgVisualizer: PianoRollSvgVisualizer,
+  showBirdView: boolean
+) {
   const visualization = document.getElementById(
     "visualization"
   )! as HTMLDivElement
@@ -36,29 +44,63 @@ export function afterContentLoaded() {
   const pianoRollButtons = document.getElementById(
     "pianoroll-controls"
   )! as HTMLDivElement
-  const fullscreenButton = document.getElementById(
-    "fullscreen-button"
-  )! as HTMLButtonElement
   const pianoRollOverlay = document.getElementById(
     "pianoroll-overlay"
   )! as HTMLDivElement
+
+  const playerControls = new PlayerControls(player, pianoRoll)
+
+  const playButton = document.getElementById("play-button") as HTMLButtonElement
+  player.addEventListener("load", () => {
+    playerControls.generateCustomSeekBar()
+    playerControls.applyCustomEventListeners(playButton)
+  })
 
   new ViewsController(
     visualization,
     pianoRollPlayer,
     pianoRollButtons,
-    fullscreenButton,
+    playerControls.fullscreenButton,
     pianoRollOverlay
   )
 
-  const volumeInput = document.getElementById(
-    "volume-slider"
-  ) as HTMLInputElement
+  if (showBirdView) {
+    const playerProgressController = new PlayerProgressController(
+      playerControls,
+      pianoRoll,
+      visualization
+    )
 
-  new VolumeController(player, volumeInput)
+    updateProgressSvgHeight()
+
+    pianoRollSvgVisualizer.reload = () => {}
+    pianoRollSvgVisualizer.clearActiveNotes = () => {}
+    pianoRollSvgVisualizer.redraw = (noteDetails: any) => {
+      const currentTime = noteDetails.startTime
+      pianoRoll.redrawWithNewTime(currentTime)
+      const newPosition = currentTime / player.duration
+
+      playerControls.updateSeekBarPosition(currentTime)
+      playerProgressController.updateProgressIndicatorPosition(newPosition)
+      playerProgressController.updateCurrentAreaRectanglePosition()
+    }
+    player.addVisualizer(pianoRollSvgVisualizer)
+  } else {
+    pianoRollSvgVisualizer.reload = () => {}
+    pianoRollSvgVisualizer.clearActiveNotes = () => {}
+    pianoRollSvgVisualizer.redraw = (noteDetails) => {
+      const currentTime = noteDetails.startTime
+      pianoRoll.redrawWithNewTime(currentTime)
+
+      playerControls.updateSeekBarPosition(currentTime)
+    }
+
+    player.addVisualizer(pianoRollSvgVisualizer)
+  }
 }
 
 export function onStreamlitRender(event: Event): void {
+  updateProgressSvgHeight()
   // Get the RenderData from the event
   const data = (event as CustomEvent<RenderData>).detail
 
@@ -75,10 +117,8 @@ export function onStreamlitRender(event: Event): void {
     return
   } else player.setAttribute("data-midi", JSON.stringify(midi_data))
 
-  // TODO: better typing, try to avoid "as unknown"
-  const pianorollSvg = document.getElementById(
-    "my-svg"
-  )! as unknown as SVGSVGElement
+  // Fixed typing to avoid "as unknown"
+  const pianorollSvg = document.querySelector("#my-svg")! as SVGSVGElement
   pianorollSvg.innerHTML = ""
 
   // Prepare the notes and viualization manager (PianoRoll)
@@ -86,13 +126,9 @@ export function onStreamlitRender(event: Event): void {
   const pianorollSvgVisualizer = enhancePianoRollSvg(pianorollSvg)
   const pianoRoll = new PianoRoll(pianorollSvgVisualizer, note_sequence)
 
-  pianorollSvgVisualizer.reload = () => {}
-  pianorollSvgVisualizer.clearActiveNotes = () => {}
-  pianorollSvgVisualizer.redraw = (noteDetails) => {
-    const currentTime = noteDetails.startTime
-    pianoRoll.redrawWithNewTime(currentTime)
-  }
-  player.addVisualizer(pianorollSvgVisualizer)
+  const showBirdView = data.args["show_bird_view"]
+
+  preparePlayerControls(player, pianoRoll, pianorollSvgVisualizer, showBirdView)
 
   // TODO Clean code
   const notes_per_second = 30
@@ -121,4 +157,24 @@ export function onStreamlitRender(event: Event): void {
   }
   // *noteSequence* in the player is a more complex structure than a sequence of notes
   player.noteSequence = midi_data
+}
+
+function updateProgressSvgHeight() {
+  const pianoRollSvgVisualizer = document.querySelector(
+    "#my-svg"
+  )! as SVGElement
+  const progressBarSVG = document.querySelector("#progress-bar")! as SVGElement
+
+  if (!pianoRollSvgVisualizer || !progressBarSVG) return
+
+  const percentage = 16.5
+  const minHeight = 48 // 3rem if font-size is 16px
+  const maxHeight = 220 // 13.75rem if font-size is 16px
+
+  let progressHeight =
+    (percentage / 100) * pianoRollSvgVisualizer.getBoundingClientRect().height
+
+  progressHeight = Math.max(minHeight, Math.min(progressHeight, maxHeight))
+  console.log(progressHeight.toFixed(0))
+  progressBarSVG.setAttribute("height", `${progressHeight.toFixed(0)}px`)
 }

@@ -6,6 +6,12 @@ export interface MidiPlayerElement extends HTMLElement {
       }
     }
   }
+  start(): void
+  stop(): void
+  playing: boolean
+  shadowRoot: ShadowRoot
+  currentTime: number
+  duration: number
   noteSequence?: NoteSequence
   addVisualizer(visualizer: PianoRollSvgVisualizer): void
 }
@@ -46,4 +52,10 @@ export interface NoteRectangleInfo {
   height: number
   x_left: number
   x_right: number
+}
+
+export interface VolumeControl {
+  midiPlayer: MidiPlayerElement
+  volumeInput: HTMLInputElement
+  muteButton: HTMLButtonElement
 }

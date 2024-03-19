@@ -19,83 +19,44 @@
 
   <body>
     <div id="visualization" class="theater-mode">
-      <div class="row">
-        <div id="pianoroll-player" class="col pianoroll-svg-wrapper">
-          <svg id="my-svg" class="pianoroll-svg" width="100%"></svg>
+      <div id="pianoroll-player" class="pianoroll-svg-wrapper">
+        <svg id="my-svg" class="pianoroll-svg" width="100%"></svg>
 
-          <a href="https://pianoroll.io" target="_blank" class="pianoroll-link">
-            <img src="color.svg" alt="PianoRoll icon" width="20" height="20" />
-          </a>
+        <a href="https://pianoroll.io" target="_blank" class="pianoroll-link">
+          <img src="color.svg" alt="PianoRoll icon" width="20" height="20" />
+        </a>
 
-          <div id="pianoroll-controls" class="controls-wrapper hidden">
-            <div class="pianoroll-controls-left">
-              <button
-                id="mute-button"
-                aria-label="Mute"
-                title="Mute"
-                class="button"
-              >
-                <svg
-                  focusable="false"
-                  aria-hidden="true"
-                  viewBox="0 0 24 24"
-                  height="24px"
-                  width="24px"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fill="currentColor"
-                    d="M3 9v6h4l5 5V4L7 9zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02M14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77"
-                  />
-                </svg>
-              </button>
-              <div class="slider-wrapper">
-                <input
-                  title="Volume"
-                  role="slider"
-                  aria-label="Volume"
-                  aria-valuenow="-3"
-                  aria-valuetext="-3dB volume"
-                  aria-valuemin="-50"
-                  aria-valuemax="5"
-                  type="range"
-                  min="-50"
-                  max="5"
-                  value="-3"
-                  id="volume-slider"
-                  autocomplete="off"
-                />
-              </div>
-            </div>
+        <button id="play-button" class="button play-button-overlay hidden">
+          <svg
+            width="64"
+            height="64"
+            viewBox="0 0 64 64"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <g style="mix-blend-mode: multiply" opacity="0.5">
+              <circle cx="32" cy="32" r="32" fill="#60B8C4" />
+            </g>
+            <path
+              d="M32 50.3334C42.1252 50.3334 50.3334 42.1252 50.3334 32C50.3334 21.8748 42.1252 13.6667 32 13.6667C21.8748 13.6667 13.6667 21.8748 13.6667 32C13.6667 42.1252 21.8748 50.3334 32 50.3334Z"
+              fill="#154151"
+            />
+            <path
+              d="M28.3333 24.6667L39.3333 32L28.3333 39.3334V24.6667Z"
+              fill="#F9FAFA"
+              stroke="#F9FAFA"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </button>
 
-            <div class="pianoroll-controls-right">
-              <button id="fullscreen-button" class="button" title="Full screen">
-                <svg
-                  focusable="false"
-                  aria-hidden="true"
-                  viewBox="0 0 24 24"
-                  height="32px"
-                  width="32px"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fill="currentColor"
-                    d="M7 14H5v5h5v-2H7zm-2-4h2V7h3V5H5zm12 7h-3v2h5v-5h-2zM14 5v2h3v3h2V5z"
-                  />
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          <div id="pianoroll-overlay" class="gradient-overlay hidden"></div>
-        </div>
-      </div>
-
-      <div class="row control-panel">
-        <div class="col">
+        <div id="pianoroll-controls" class="controls-wrapper hidden">
           <midi-player id="my-midi-player" sound-font> </midi-player>
         </div>
-        <div class="col"></div>
+
+        <div id="pianoroll-overlay" class="gradient-overlay hidden"></div>
       </div>
     </div>
     <noscript>You need to enable JavaScript to run this app.</noscript>
