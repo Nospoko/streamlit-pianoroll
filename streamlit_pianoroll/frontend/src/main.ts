@@ -169,7 +169,7 @@ function updateProgressSvgHeight() {
 
   const percentage = 16.5
   const minHeight = 48 // 3rem if font-size is 16px
-  const maxHeight = 80 // 5rem if font-size is 16px
+  const maxHeight = 220 // 13.75rem if font-size is 16px
 
   let progressHeight =
     (percentage / 100) * pianoRollSvgVisualizer.getBoundingClientRect().height
