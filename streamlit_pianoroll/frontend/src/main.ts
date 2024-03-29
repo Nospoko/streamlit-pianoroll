@@ -175,6 +175,5 @@ function updateProgressSvgHeight() {
     (percentage / 100) * pianoRollSvgVisualizer.getBoundingClientRect().height
 
   progressHeight = Math.max(minHeight, Math.min(progressHeight, maxHeight))
-  console.log(progressHeight.toFixed(0))
   progressBarSVG.setAttribute("height", `${progressHeight.toFixed(0)}px`)
 }

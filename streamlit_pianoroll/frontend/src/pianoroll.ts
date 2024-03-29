@@ -183,6 +183,9 @@ class PianoRoll {
   }
 
   private updateCurrentPageIdx(current_time: number): void {
+    // Block updating page index when current time is equal total duration as it is the end
+    if (current_time >= this.duration_total) return
+
     // Find the current page
     const page_index = Math.floor(current_time / this.page_duration)
     if (page_index !== this.current_page_idx) {

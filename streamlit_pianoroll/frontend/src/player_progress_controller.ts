@@ -1,6 +1,6 @@
 import PianoRoll from "./pianoroll"
 import PlayerControls from "./player_controls"
-import { Note } from "./types"
+import { Note, NoteRectangleInfo, NoteSequence } from "./types"
 
 class PlayerProgressController {
   playerControls: PlayerControls
@@ -10,6 +10,10 @@ class PlayerProgressController {
   pianoRoll: PianoRoll
   isPlaying: boolean
   parent: HTMLDivElement
+  pitchMin!: number
+  pitchMax!: number
+  pitchSpan!: number
+  noteHeight!: number
 
   constructor(
     playerControls: PlayerControls,
@@ -36,6 +40,7 @@ class PlayerProgressController {
 
     this.playerControls.createPlayerProgressRef(this)
 
+    this.calcPitches()
     this.drawEmptyProgressTimeline()
     this.drawCurrentAreaRectangle()
     this.drawProgressIndicator()
@@ -163,19 +168,6 @@ class PlayerProgressController {
       this.progressBarSVG
     )
 
-    const sequenceSvg = document.createElementNS(
-      "http://www.w3.org/2000/svg",
-      "svg"
-    )
-    sequenceSvg.innerHTML = ""
-    sequenceSvg.setAttribute("width", `100%`)
-    sequenceSvg.setAttribute("height", "100%")
-    sequenceSvg.setAttribute(
-      "viewBox",
-      `0 0 ${this.pianoRoll.note_pages.length} 1`
-    )
-    sequenceSvg.setAttribute("preserveAspectRatio", "none")
-
     for (
       let current_page_idx = 0;
       current_page_idx < this.pianoRoll.note_pages.length;
@@ -184,12 +176,11 @@ class PlayerProgressController {
       const sequence = this.pianoRoll.note_pages[current_page_idx]
 
       sequence.forEach((note: Note) => {
-        const noteRectangleInfo = this.pianoRoll.createNoteRectangle(note)
-        sequenceSvg.appendChild(noteRectangleInfo.noteRectangle)
+        const noteRectangleInfo = this.createNoteRectangle(note)
+        this.progressBarSVG.appendChild(noteRectangleInfo.noteRectangle)
       })
     }
 
-    this.progressBarSVG.appendChild(sequenceSvg)
     this.progressBarSVG.appendChild(this.progressIndicator)
   }
 
@@ -213,6 +204,69 @@ class PlayerProgressController {
     this.parent.appendChild(progressBarWrapper)
 
     this.drawProgressTimeline()
+  }
+
+  createNoteRectangle(note: Note): NoteRectangleInfo {
+    const noteRectangle = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "rect"
+    )
+    const x = this.timeToX(note.startTime)
+    const w = this.durationToWidth(note.endTime - note.startTime)
+    const y = 1 - (note.pitch - this.pitchMin) / this.pitchSpan
+
+    const color = this.pianoRoll.colormap[note.velocity]
+
+    noteRectangle.setAttribute("x", `${x}`)
+    noteRectangle.setAttribute("width", `${w}`)
+    noteRectangle.setAttribute("y", `${y}`)
+    noteRectangle.setAttribute("height", `${this.noteHeight}`)
+    noteRectangle.setAttribute("fill", color)
+    noteRectangle.classList.add("note-rectangle")
+
+    // Store it
+    const trackedNote = {
+      noteRectangle: noteRectangle,
+      velocity_color: color,
+      y: y,
+      x_left: x,
+      x_right: x + w,
+      width: w,
+      height: this.noteHeight,
+    }
+
+    return trackedNote
+  }
+
+  calcPitches() {
+    // Calc the global pitch values for all sequences to display them in one line
+    const emptyArray = [] as NoteSequence
+    const allSequences = emptyArray.concat(...this.pianoRoll.note_pages)
+
+    const pitches = allSequences.map((note) => note.pitch)
+
+    this.pitchMin = Math.min(...pitches)
+    this.pitchMax = Math.max(...pitches)
+
+    if (this.pitchSpan < 24) {
+      const diff = 24 - this.pitchSpan
+      this.pitchMin -= Math.ceil(diff / 2)
+      this.pitchMax += Math.floor(diff / 2)
+    }
+
+    this.pitchMin -= 3
+    this.pitchMax += 3
+    this.pitchSpan = this.pitchMax - this.pitchMin
+    this.noteHeight = 1 / this.pitchSpan
+  }
+
+  timeToX(time: number) {
+    return time / this.pianoRoll.duration_total
+  }
+
+  durationToWidth(duration: number) {
+    // Offset Pagination
+    return duration / this.pianoRoll.duration_total
   }
 }
 
