@@ -184,6 +184,8 @@ class PianoRoll {
 
   private updateCurrentPageIdx(current_time: number): void {
     // Block updating page index when current time is equal total duration as it is the end
+    // The bug may come from the MIDI player library, because sometimes "currentTime" exceeds "this.end" time
+    // But also when "current_time" equals "this.end", dividing "current_time / this.page_duration" returns a value that exceeds the max number of pages
     if (current_time >= this.duration_total) return
 
     // Find the current page
