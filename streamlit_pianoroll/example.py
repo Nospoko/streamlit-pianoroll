@@ -44,7 +44,11 @@ for jt in range(2):
         "totalTime": notes[-1]["endTime"],
         "notes": notes,
     }
-    pianoroll_player(midi_data=midi_data, key=str(jt), use_api_soundfonts=False)
+    use_api_soundfonts = bool(jt % 2)
+    if not use_api_soundfonts:
+        st.markdown("The first player uses local soundfonts")
+
+    pianoroll_player(midi_data=midi_data, key=str(jt), use_api_soundfonts=bool(jt % 2))
     st.markdown("---")
 
 notes_primary = make_some_notes(first_note=60, fortepyan_format=True)
@@ -56,10 +60,10 @@ piece_secondary = MidiPiece(df=pd.DataFrame(notes_secondary))
 display_columns = st.columns(3)
 with display_columns[0]:
     st.write("Piece A")
-    from_fortepyan(piece=piece, use_api_soundfonts=False)
+    from_fortepyan(piece=piece)
 with display_columns[1]:
     st.write("Piece B")
-    from_fortepyan(piece=piece_secondary, use_api_soundfonts=False)
+    from_fortepyan(piece=piece_secondary)
 with display_columns[2]:
     st.write("Piece A & B")
-    from_fortepyan(piece=piece, secondary_piece=piece_secondary, use_api_soundfonts=False)
+    from_fortepyan(piece=piece, secondary_piece=piece_secondary)
