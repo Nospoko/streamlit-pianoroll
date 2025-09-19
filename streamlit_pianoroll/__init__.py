@@ -46,13 +46,22 @@ else:
 # `declare_component` and call it done. The wrapper allows us to customize
 # our component's API: we can pre-process its input args, post-process its
 # output value, and add a docstring for users.
-def pianoroll_player(midi_data: dict, show_bird_view, key=None):
+def pianoroll_player(
+    midi_data: dict,
+    show_bird_view: bool = True,
+    sound_font_url: str = None,
+    key=None,
+):
     """Create a new instance of "pianoroll".
 
     Parameters
     ----------
     midi_data: dict
         MIDI notes in a format that the html player will accept
+    show_bird_view: bool
+        Whether to display the bottom "bird" visualization with full sequence.
+    sound_font_url: str or None
+        If None (default), use soundfonts from API. If url is provided, use soundfonts from url.
     key: str or None
         An optional key that uniquely identifies this component. If this is
         None, and the component's arguments are changed, the component will
@@ -68,14 +77,26 @@ def pianoroll_player(midi_data: dict, show_bird_view, key=None):
     #
     # "default" is a special argument that specifies the initial return
     # value of the component before the user has interacted with it.
-    component_value = _component_func(key=key, default=0, midi_data=midi_data, show_bird_view=show_bird_view)
+    component_value = _component_func(
+        key=key,
+        default=0,
+        midi_data=midi_data,
+        show_bird_view=show_bird_view,
+        sound_font_url=sound_font_url,
+    )
 
     # We could modify the value returned from the component if we wanted.
     # There's no need to do this in our simple example - but it's an option.
     return component_value
 
 
-def from_fortepyan(piece: MidiPiece, secondary_piece: MidiPiece = None, key=None, show_bird_view=True):
+def from_fortepyan(
+    piece: MidiPiece,
+    secondary_piece: MidiPiece = None,
+    key=None,
+    show_bird_view: bool = True,
+    sound_font_url: str = None,
+):
     df = piece.df.copy()
 
     if secondary_piece is not None:
@@ -98,5 +119,10 @@ def from_fortepyan(piece: MidiPiece, secondary_piece: MidiPiece = None, key=None
         "totalTime": df.endTime.max(),
     }
 
-    component_value = pianoroll_player(midi_data=midi_data, key=key, show_bird_view=show_bird_view)
+    component_value = pianoroll_player(
+        midi_data=midi_data,
+        key=key,
+        show_bird_view=show_bird_view,
+        sound_font_url=sound_font_url,
+    )
     return component_value
