@@ -158,9 +158,9 @@ export function onStreamlitRender(event: Event): void {
   // *noteSequence* in the player is a more complex structure than a sequence of notes
   player.noteSequence = midi_data
 
-  const useApiSoundFonts = data.args["use_api_soundfonts"]
-  if (!useApiSoundFonts) {
-    player.soundFont = "soundfonts"
+  const soundFontUrl = data.args["sound_font_url"]
+  if (soundFontUrl) {
+    player.soundFont = soundFontUrl
   }
 }
 

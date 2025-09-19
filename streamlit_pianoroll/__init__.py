@@ -49,7 +49,7 @@ else:
 def pianoroll_player(
     midi_data: dict,
     show_bird_view: bool = True,
-    use_api_soundfonts: bool = True,
+    sound_font_url: str = None,
     key=None,
 ):
     """Create a new instance of "pianoroll".
@@ -60,8 +60,8 @@ def pianoroll_player(
         MIDI notes in a format that the html player will accept
     show_bird_view: bool
         Whether to display the bottom "bird" visualization with full sequence.
-    use_api_soundfonts: bool
-        If True (default), use soundfonts from API. If False, use local soundfonts.
+    sound_font_url: str or None
+        If None (default), use soundfonts from API. If url is provided, use soundfonts from url.
     key: str or None
         An optional key that uniquely identifies this component. If this is
         None, and the component's arguments are changed, the component will
@@ -82,7 +82,7 @@ def pianoroll_player(
         default=0,
         midi_data=midi_data,
         show_bird_view=show_bird_view,
-        use_api_soundfonts=use_api_soundfonts,
+        sound_font_url=sound_font_url,
     )
 
     # We could modify the value returned from the component if we wanted.
@@ -95,7 +95,7 @@ def from_fortepyan(
     secondary_piece: MidiPiece = None,
     key=None,
     show_bird_view: bool = True,
-    use_api_soundfonts: bool = True,
+    sound_font_url: str = True,
 ):
     df = piece.df.copy()
 
@@ -123,6 +123,6 @@ def from_fortepyan(
         midi_data=midi_data,
         key=key,
         show_bird_view=show_bird_view,
-        use_api_soundfonts=use_api_soundfonts,
+        sound_font_url=sound_font_url,
     )
     return component_value

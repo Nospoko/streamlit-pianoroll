@@ -44,11 +44,13 @@ for jt in range(2):
         "totalTime": notes[-1]["endTime"],
         "notes": notes,
     }
-    use_api_soundfonts = bool(jt % 2)
-    if not use_api_soundfonts:
-        st.markdown("The first player uses local soundfonts")
 
-    pianoroll_player(midi_data=midi_data, key=str(jt), use_api_soundfonts=bool(jt % 2))
+    sound_font_url = "https://soundfonts.ams3.digitaloceanspaces.com/sgm_plus"
+    pianoroll_player(
+        midi_data=midi_data,
+        key=str(jt),
+        sound_font_url=sound_font_url,
+    )
     st.markdown("---")
 
 notes_primary = make_some_notes(first_note=60, fortepyan_format=True)
