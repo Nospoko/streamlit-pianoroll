@@ -44,7 +44,11 @@ for jt in range(2):
         "totalTime": notes[-1]["endTime"],
         "notes": notes,
     }
-    pianoroll_player(midi_data=midi_data, key=jt)
+
+    pianoroll_player(
+        midi_data=midi_data,
+        key=str(jt),
+    )
     st.markdown("---")
 
 notes_primary = make_some_notes(first_note=60, fortepyan_format=True)
