@@ -23,6 +23,7 @@ class PianoRoll {
   page_duration: number = 40
 
   constructor(svgElement: SVGSVGElement, sequence: NoteSequence) {
+    this.setInitialState()
     this.noteSequence = sequence
     this.svgElement = svgElement
     this.timeIndicator = null
@@ -45,9 +46,75 @@ class PianoRoll {
     this.drawPianoRoll()
   }
 
+  public setInitialState(): void {
+    // Clear all SVG content
+    this.clearAllSvgContent()
+
+    // Reset all flags and state variables to initial values
+    this.resetStateVariables()
+  }
+
+  private clearAllSvgContent(): void {
+    // Clear main SVG
+    if (this.svgElement) {
+      this.svgElement.innerHTML = ""
+    }
+
+    // Clear displayed notes array
+    if (this.displayedNotes) {
+      this.displayedNotes.forEach((noteInfo) => {
+        // Remove any event listeners from note rectangles if they exist
+        if (noteInfo.noteRectangle) {
+          noteInfo.noteRectangle.remove()
+        }
+      })
+      this.displayedNotes = []
+    }
+
+    // Clear notes SVG
+    if (this.notesSvg) {
+      this.notesSvg.remove()
+    }
+
+    // Clear keyboard SVG
+    if (this.keyboardSvg) {
+      this.keyboardSvg.remove()
+    }
+
+    // Remove time indicator
+    if (this.timeIndicator) {
+      this.timeIndicator.remove()
+      this.timeIndicator = null
+    }
+  }
+
+  private resetStateVariables(): void {
+    // Reset pagination
+    this.current_page_idx = 0
+    this.note_pages = []
+    this.page_duration = 40
+
+    // Reset timing
+    this.end = 1
+    if (this.noteSequence && this.noteSequence.length > 0) {
+      this.duration_total =
+        this.noteSequence[this.noteSequence.length - 1].endTime
+    }
+
+    // Reset pitch-related variables (will be recalculated)
+    this.pitchMin = undefined!
+    this.pitchMax = undefined!
+    this.pitchSpan = undefined!
+    this.noteHeight = undefined!
+
+    // Clear displayed notes
+    this.displayedNotes = []
+  }
+
   private prepareSvg() {
     this.svgElement.setAttribute("viewBox", "0 0 1 1")
     this.svgElement.setAttribute("preserveAspectRatio", "none")
+    this.svgElement.innerHTML = ""
 
     this.notesSvg.setAttribute("width", "98%")
     this.notesSvg.setAttribute("height", "100%")
@@ -178,6 +245,7 @@ class PianoRoll {
     line.setAttribute("y2", "1")
     line.setAttribute("stroke", "#E8A03E")
     line.setAttribute("stroke-width", "0.002")
+    line.id = "time-indicator"
     this.timeIndicator = line
     this.notesSvg.appendChild(this.timeIndicator)
   }
@@ -352,6 +420,7 @@ class PianoRoll {
     rect.setAttribute("height", `${height}`)
     rect.setAttribute("fill", fill)
     rect.setAttribute("fill-opacity", `${fillOpacity}`)
+    rect.classList.add("note-rect")
     return rect
   }
 
@@ -370,6 +439,7 @@ class PianoRoll {
     line.setAttribute("y2", `${y2}`)
     line.setAttribute("stroke-width", `${strokeWidth}`)
     line.setAttribute("stroke", "black")
+    line.classList.add("line-separator")
     return line
   }
 
