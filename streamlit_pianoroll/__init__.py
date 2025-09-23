@@ -8,7 +8,7 @@ import streamlit.components.v1 as components
 # the component, and True when we're ready to package and distribute it.
 # (This is, of course, optional - there are innumerable ways to manage your
 # release process.)
-_RELEASE = False
+_RELEASE = True
 
 # Declare a Streamlit component. `declare_component` returns a function
 # that is used to create instances of the component. We're naming this
@@ -46,7 +46,11 @@ else:
 # `declare_component` and call it done. The wrapper allows us to customize
 # our component's API: we can pre-process its input args, post-process its
 # output value, and add a docstring for users.
-def pianoroll_player(midi_data: dict, show_bird_view: bool = True, key=None):
+def pianoroll_player(
+    midi_data: dict,
+    show_bird_view: bool,
+    key: str = None,
+):
     """Create a new instance of "pianoroll".
 
     Parameters
@@ -75,11 +79,38 @@ def pianoroll_player(midi_data: dict, show_bird_view: bool = True, key=None):
     return component_value
 
 
+def from_notes_df(
+    notes_df: pd.DataFrame,
+    show_bird_view: bool = True,
+    key: str = None,
+):
+    # This is what the html midi player expects
+    column_mapping = {
+        "start": "startTime",
+        "end": "endTime",
+    }
+    df = notes_df.rename(columns=column_mapping)
+
+    # This is the data structure expected by the html <midi-player>
+    notes = df.to_dict(orient="records")
+    midi_data = {
+        "notes": notes,
+        "totalTime": df.endTime.max(),
+    }
+    component_value = pianoroll_player(
+        midi_data=midi_data,
+        key=key,
+        show_bird_view=show_bird_view,
+    )
+
+    return component_value
+
+
 def from_fortepyan(
     piece: MidiPiece,
     secondary_piece: MidiPiece = None,
-    key=None,
     show_bird_view: bool = True,
+    key: str = None,
 ):
     df = piece.df.copy()
 
@@ -90,18 +121,10 @@ def from_fortepyan(
         df = pd.concat([df, secondary_df])
         df = df.sort_values("start", ignore_index=True)
 
-    # This is what the html midi player expects
-    column_mapping = {
-        "start": "startTime",
-        "end": "endTime",
-    }
-    df = df.rename(columns=column_mapping)
+    component_value = from_notes_df(
+        notes_df=df,
+        show_bird_view=show_bird_view,
+        key=key,
+    )
 
-    notes = df.to_dict(orient="records")
-    midi_data = {
-        "notes": notes,
-        "totalTime": df.endTime.max(),
-    }
-
-    component_value = pianoroll_player(midi_data=midi_data, key=key, show_bird_view=show_bird_view)
     return component_value
