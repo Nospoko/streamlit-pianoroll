@@ -7,7 +7,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setuptools.setup(
     name="streamlit-pianoroll",
-    version="0.7.3",
+    version="0.7.4",
     author="Bathilda Bagshot",
     author_email="tomek@epr-labs.com",
     description="Streamlit component that allows you to play piano",
