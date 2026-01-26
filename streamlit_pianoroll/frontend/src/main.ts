@@ -47,14 +47,13 @@ function preparePlayerControls(
   const pianoRollOverlay = document.getElementById(
     "pianoroll-overlay"
   )! as HTMLDivElement
-
-  const playerControls = new PlayerControls(player, pianoRoll)
-
   const playButton = document.getElementById("play-button") as HTMLButtonElement
-  player.addEventListener("load", () => {
-    playerControls.generateCustomSeekBar()
-    playerControls.applyCustomEventListeners(playButton)
-  })
+
+  const playerControls = PlayerControls.getInstance(
+    player,
+    pianoRoll,
+    playButton
+  )
 
   new ViewsController(
     visualization,
@@ -64,8 +63,12 @@ function preparePlayerControls(
     pianoRollOverlay
   )
 
+  if (player.currentTime && player.currentTime !== 0) {
+    pianoRoll.redrawWithNewTime(player.currentTime)
+  }
+
   if (showBirdView) {
-    const playerProgressController = new PlayerProgressController(
+    const playerProgressController = PlayerProgressController.getInstance(
       playerControls,
       pianoRoll,
       visualization

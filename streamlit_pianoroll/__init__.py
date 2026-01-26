@@ -90,12 +90,39 @@ def pianoroll_player(
     return component_value
 
 
+def from_notes_df(
+    notes_df: pd.DataFrame,
+    sound_font_url: str = None,
+    show_bird_view: bool = True,
+    key: str = None,
+):
+    # This is what the html midi player expects
+    column_mapping = {
+        "start": "startTime",
+        "end": "endTime",
+    }
+    df = notes_df.rename(columns=column_mapping)
+
+    # This is the data structure expected by the html <midi-player>
+    notes = df.to_dict(orient="records")
+    midi_data = {
+        "notes": notes,
+        "totalTime": df.endTime.max(),
+    }
+    component_value = pianoroll_player(
+        midi_data=midi_data,
+        key=key,
+        show_bird_view=show_bird_view,
+    )
+
+    return component_value
+
+
 def from_fortepyan(
     piece: MidiPiece,
     secondary_piece: MidiPiece = None,
-    key=None,
     show_bird_view: bool = True,
-    sound_font_url: str = None,
+    key: str = None,
 ):
     df = piece.df.copy()
 
@@ -106,23 +133,10 @@ def from_fortepyan(
         df = pd.concat([df, secondary_df])
         df = df.sort_values("start", ignore_index=True)
 
-    # This is what the html midi player expects
-    column_mapping = {
-        "start": "startTime",
-        "end": "endTime",
-    }
-    df = df.rename(columns=column_mapping)
-
-    notes = df.to_dict(orient="records")
-    midi_data = {
-        "notes": notes,
-        "totalTime": df.endTime.max(),
-    }
-
-    component_value = pianoroll_player(
-        midi_data=midi_data,
-        key=key,
+    component_value = from_notes_df(
+        notes_df=df,
         show_bird_view=show_bird_view,
-        sound_font_url=sound_font_url,
+        key=key,
     )
+
     return component_value

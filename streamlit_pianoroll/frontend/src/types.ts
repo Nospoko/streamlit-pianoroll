@@ -59,4 +59,5 @@ export interface VolumeControl {
   midiPlayer: MidiPlayerElement
   volumeInput: HTMLInputElement
   muteButton: HTMLButtonElement
+  setInitialState(): void
 }

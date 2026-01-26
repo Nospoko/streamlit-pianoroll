@@ -3,6 +3,8 @@ import PlayerControls from "./player_controls"
 import { Note, NoteRectangleInfo, NoteSequence } from "./types"
 
 class PlayerProgressController {
+  private static instance: PlayerProgressController | null = null
+
   playerControls: PlayerControls
   progressBarSVG: SVGSVGElement
   progressIndicator: SVGLineElement
@@ -47,6 +49,48 @@ class PlayerProgressController {
 
     this.progressBarSVG.addEventListener("mousedown", this.onMouseDown)
     this.progressBarSVG.addEventListener("touchstart", this.onTouchDown)
+  }
+
+  public static getInstance(
+    playerControls: PlayerControls,
+    pianoRoll: PianoRoll,
+    parent: HTMLDivElement
+  ): PlayerProgressController {
+    if (!this.instance) {
+      this.instance = new PlayerProgressController(
+        playerControls,
+        pianoRoll,
+        parent
+      )
+    }
+    // Pianoroll is always reinitialized, so update the reference
+    this.instance.pianoRoll = pianoRoll
+    return this.instance
+  }
+
+  public reset() {
+    this.isPlaying = false
+
+    this.progressBarSVG.remove()
+    this.progressIndicator.remove()
+    this.currentAreaRectangle.remove()
+
+    let child = this.parent.lastElementChild
+    while (child) {
+      child.remove()
+      child = this.parent.lastElementChild
+    }
+
+    this.progressBarSVG.removeEventListener("mousedown", this.onMouseDown)
+    this.progressBarSVG.removeEventListener("touchstart", this.onTouchDown)
+
+    document.removeEventListener("mousemove", this.onMouseMove)
+    document.removeEventListener("mouseup", this.onMouseUp)
+
+    document.removeEventListener("touchmove", this.onTouchMove)
+    document.removeEventListener("touchend", this.onTouchEnd)
+
+    PlayerProgressController.instance = null
   }
 
   private onMouseDown = (e: MouseEvent) => {

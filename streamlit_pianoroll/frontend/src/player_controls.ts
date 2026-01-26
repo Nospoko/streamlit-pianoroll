@@ -5,6 +5,8 @@ import { MidiPlayerElement, VolumeControl } from "./types"
 import VolumeController from "./volume_controller"
 
 class PlayerControls {
+  private static instance: PlayerControls | null = null
+
   midiPlayer: MidiPlayerElement
   controlsLeft: HTMLDivElement
   controlsRight: HTMLDivElement
@@ -21,9 +23,14 @@ class PlayerControls {
   isPlaying: boolean
   playingFlag: boolean
   pianoRoll: PianoRoll
+  centralPlayButton: HTMLButtonElement
   playerProgress: PlayerProgressController | null
 
-  constructor(midiPlayer: MidiPlayerElement, pianoRoll: PianoRoll) {
+  constructor(
+    midiPlayer: MidiPlayerElement,
+    pianoRoll: PianoRoll,
+    centralPlayButton: HTMLButtonElement
+  ) {
     this.midiPlayer = midiPlayer
     this.controlsLeft = document.createElement("div")
     this.controlsRight = document.createElement("div")
@@ -45,16 +52,36 @@ class PlayerControls {
     this.playingFlag = false
     this.pianoRoll = pianoRoll
     this.playerProgress = null
+    this.centralPlayButton = centralPlayButton
 
     this.generateControls()
     this.applyCustomStyling()
     this.applyCustomSeekBarEventListeners()
 
+    this.midiPlayer.addEventListener("load", this.playerLoaded)
     this.volumeControl = new VolumeController(
       this.midiPlayer,
       this.volumeSlider,
       this.muteButton
     )
+  }
+
+  public static getInstance(
+    midiPlayer: MidiPlayerElement,
+    pianoRoll: PianoRoll,
+    centralPlayButton: HTMLButtonElement
+  ): PlayerControls {
+    if (!this.instance) {
+      this.instance = new PlayerControls(
+        midiPlayer,
+        pianoRoll,
+        centralPlayButton
+      )
+    }
+
+    // Pianoroll is always reinitialized, so update the reference
+    this.instance.pianoRoll = pianoRoll
+    return this.instance
   }
 
   applyCustomStyling(externalStyles?: string) {
@@ -287,65 +314,137 @@ class PlayerControls {
     this.playerStyles.innerHTML += styles + externalStyles
   }
 
-  applyCustomEventListeners(centralPlayButton: HTMLButtonElement) {
-    centralPlayButton.classList.remove("hidden")
+  public reset(): void {
+    if (this.volumeControl) {
+      this.volumeControl.setInitialState()
+    }
 
-    this.midiPlayer.addEventListener("stop", () => {
-      centralPlayButton.classList.remove("fadeOut")
-      centralPlayButton.classList.add("fadeIn")
-    })
+    this.removeEventListeners()
 
-    this.midiPlayer.addEventListener("start", () => {
-      centralPlayButton.classList.remove("fadeIn")
-      centralPlayButton.classList.add("fadeOut")
+    // Remove custom DOM elements
+    if (this.controlsLeft && this.controlsElement.contains(this.controlsLeft)) {
+      this.controlsElement.removeChild(this.controlsLeft)
+    }
+    if (
+      this.controlsRight &&
+      this.controlsElement.contains(this.controlsRight)
+    ) {
+      this.controlsElement.removeChild(this.controlsRight)
+    }
+    if (
+      this.seekBarElement &&
+      this.controlsElement.contains(this.seekBarElement)
+    ) {
+      this.controlsElement.removeChild(this.seekBarElement)
+    }
 
-      this.isPlaying = true
-    })
+    // Clear styles
+    if (this.playerStyles) {
+      this.playerStyles.innerHTML = ""
+    }
 
-    centralPlayButton.addEventListener("click", () => {
-      if (!this.midiPlayer.noteSequence) return
-      if (this.midiPlayer.playing) this.midiPlayer.stop()
-      else this.midiPlayer.start()
-    })
+    // Reset flags and references
+    this.isPlaying = false
+    this.playingFlag = false
+    this.playerProgress = null
+
+    // Remove the singleton reference
+    PlayerControls.instance = null
+  }
+
+  removeEventListeners = () => {
+    if (this.midiPlayer) {
+      this.midiPlayer.removeEventListener("stop", this.showCentralPlayButton)
+      this.midiPlayer.removeEventListener("start", this.hideCentralPlayButton)
+    }
+
+    if (this.centralPlayButton) {
+      this.centralPlayButton.removeEventListener(
+        "click",
+        this.clickCentralPlayButton
+      )
+    }
+
+    if (this.seekBarElement) {
+      this.seekBarElement.removeEventListener("input", this.onSeekBarInput)
+      this.seekBarElement.removeEventListener("change", this.onSeekBarChange)
+    }
+  }
+
+  playerLoaded = () => {
+    this.generateCustomSeekBar()
+    this.applyCustomEventListeners()
+  }
+
+  applyCustomEventListeners() {
+    this.centralPlayButton.classList.remove("hidden")
+
+    this.midiPlayer.addEventListener("stop", this.showCentralPlayButton)
+    this.midiPlayer.addEventListener("start", this.hideCentralPlayButton)
+    this.centralPlayButton.addEventListener(
+      "click",
+      this.clickCentralPlayButton
+    )
+  }
+
+  showCentralPlayButton = () => {
+    this.centralPlayButton.classList.remove("fadeOut")
+    this.centralPlayButton.classList.add("fadeIn")
+  }
+
+  hideCentralPlayButton = () => {
+    this.centralPlayButton.classList.remove("fadeIn")
+    this.centralPlayButton.classList.add("fadeOut")
+
+    this.isPlaying = true
+  }
+
+  clickCentralPlayButton = () => {
+    if (!this.midiPlayer.noteSequence) return
+    if (this.midiPlayer.playing) this.midiPlayer.stop()
+    else this.midiPlayer.start()
+  }
+
+  private onSeekBarInput = (e: Event) => {
+    const time = (e.target as HTMLInputElement).value
+
+    this.midiPlayer.currentTime = +time
+    this.updateSeekBarPosition(+time)
+
+    if (!this.playingFlag) {
+      this.isPlaying = this.midiPlayer.playing
+    }
+
+    if (this.midiPlayer.player && this.midiPlayer.playing) {
+      this.midiPlayer.stop()
+    }
+
+    this.pianoRoll.redrawWithNewTime(+time)
+
+    if (this.playerProgress) {
+      this.playerProgress.updateCurrentAreaRectanglePosition()
+      this.playerProgress.updateProgressIndicatorPosition(
+        this.midiPlayer.currentTime / this.midiPlayer.duration
+      )
+    }
+
+    this.playingFlag = true
+  }
+
+  private onSeekBarChange = () => {
+    if (
+      this.isPlaying &&
+      (+this.seekBarElement.value).toFixed(6) !==
+        this.midiPlayer.duration.toFixed(6)
+    ) {
+      this.midiPlayer.start()
+    }
+    this.playingFlag = false
   }
 
   applyCustomSeekBarEventListeners() {
-    this.seekBarElement.addEventListener("input", (e) => {
-      const time = (e.target as HTMLInputElement).value
-
-      this.midiPlayer.currentTime = +time
-      this.updateSeekBarPosition(+time)
-
-      if (!this.playingFlag) {
-        this.isPlaying = this.midiPlayer.playing
-      }
-
-      if (this.midiPlayer.player && this.midiPlayer.playing) {
-        this.midiPlayer.stop()
-      }
-
-      this.pianoRoll.redrawWithNewTime(+time)
-
-      if (this.playerProgress) {
-        this.playerProgress.updateCurrentAreaRectanglePosition()
-        this.playerProgress.updateProgressIndicatorPosition(
-          this.midiPlayer.currentTime / this.midiPlayer.duration
-        )
-      }
-
-      this.playingFlag = true
-    })
-
-    this.seekBarElement.addEventListener("change", () => {
-      if (
-        this.isPlaying &&
-        (+this.seekBarElement.value).toFixed(6) !==
-          this.midiPlayer.duration.toFixed(6)
-      ) {
-        this.midiPlayer.start()
-      }
-      this.playingFlag = false
-    })
+    this.seekBarElement.addEventListener("input", this.onSeekBarInput)
+    this.seekBarElement.addEventListener("change", this.onSeekBarChange)
   }
 
   private generateControls() {
