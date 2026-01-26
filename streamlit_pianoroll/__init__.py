@@ -30,7 +30,7 @@ if not _RELEASE:
         # Pass `url` here to tell Streamlit that the component will be served
         # by the local dev server that you run via `npm run start`.
         # (This is useful while your component is in development.)
-        url="http://localhost:3210",
+        url="http://localhost:3000",
     )
 else:
     # When we're distributing a production version of the component, we'll
@@ -50,7 +50,7 @@ def pianoroll_player(
     midi_data: dict,
     show_bird_view: bool = True,
     sound_font_url: str = None,
-    key=None,
+    key: str | None = None,
 ):
     """Create a new instance of "pianoroll".
 

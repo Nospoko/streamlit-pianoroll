@@ -24,7 +24,7 @@ pianoroll()
 
 * Initialize and run the component template frontend:
 ```
-$ cd pianoroll_streamlit/frontend
+$ cd streamlit_pianoroll/frontend
 $ npm install    # Install npm dependencies
 $ npm run start  # Start the Webpack dev server
 ```

@@ -16,6 +16,7 @@ class PianoRoll {
   secondaryColormap: any
   displayedNotes!: NoteRectangleInfo[]
   timeIndicator: SVGLineElement | null
+  timeText: SVGTextElement | null
   current_page_idx: number = 0
   max_single_page_duraion: number = 40
   target_page_duration: number = 20
@@ -26,6 +27,7 @@ class PianoRoll {
     this.noteSequence = sequence
     this.svgElement = svgElement
     this.timeIndicator = null
+    this.timeText = null
     this.duration_total = sequence[sequence.length - 1].endTime
     this.end = 1
 
@@ -180,6 +182,16 @@ class PianoRoll {
     line.setAttribute("stroke-width", "0.002")
     this.timeIndicator = line
     this.notesSvg.appendChild(this.timeIndicator)
+
+    const text = document.createElementNS("http://www.w3.org/2000/svg", "text")
+    text.setAttribute("x", "0")
+    text.setAttribute("y", "0.02")
+    text.setAttribute("fill", "black")
+    text.setAttribute("font-size", "0.025")
+    text.setAttribute("font-family", "monospace")
+    text.textContent = "0.00s"
+    this.timeText = text
+    this.notesSvg.appendChild(this.timeText)
   }
 
   private updateCurrentPageIdx(current_time: number): void {
@@ -213,6 +225,11 @@ class PianoRoll {
     if (this.timeIndicator) {
       this.timeIndicator.setAttribute("x1", `${new_x}`)
       this.timeIndicator.setAttribute("x2", `${new_x}`)
+    }
+
+    if (this.timeText) {
+      this.timeText.setAttribute("x", `${new_x + 0.005}`)
+      this.timeText.textContent = `${currentTime.toFixed(2)}s`
     }
 
     // To make the rectangle grow symmetrically, we have
