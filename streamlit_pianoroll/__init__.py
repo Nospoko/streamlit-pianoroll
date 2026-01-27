@@ -122,6 +122,7 @@ def from_fortepyan(
     piece: MidiPiece,
     secondary_piece: MidiPiece = None,
     show_bird_view: bool = True,
+    sound_font_url: str = None,
     key: str = None,
 ):
     df = piece.df.copy()
@@ -136,6 +137,7 @@ def from_fortepyan(
     component_value = from_notes_df(
         notes_df=df,
         show_bird_view=show_bird_view,
+        sound_font_url=sound_font_url,
         key=key,
     )
 
