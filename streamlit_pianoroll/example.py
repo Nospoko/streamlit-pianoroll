@@ -3,22 +3,53 @@ import pandas as pd
 import streamlit as st
 from fortepyan import MidiPiece
 
-from streamlit_pianoroll import from_fortepyan, pianoroll_player
+from streamlit_pianoroll import from_notes_df, from_fortepyan
 
 # Add some test code to play with the component while it's in development.
 # During development, we can run this just as we would any other Streamlit
 # app: `$ streamlit run my_component/example.py`
 
-st.subheader("Behold, Piano Rolls!")
+
+def main():
+    st.title("Behold, Piano Rolls!")
+
+    notes_primary = make_some_notes(first_note=60)
+    notes_secondary = make_some_notes(first_note=53)
+
+    piece = MidiPiece(df=pd.DataFrame(notes_primary))
+    secondary_piece = MidiPiece(df=pd.DataFrame(notes_secondary))
+
+    st.subheader("Piece A default font")
+    from_fortepyan(
+        key="a",
+        piece=piece,
+    )
+
+    st.subheader("Piece A custom font")
+    sound_font_url = "https://soundfonts.ams3.digitaloceanspaces.com/touhou"
+    st.write(sound_font_url)
+
+    from_fortepyan(
+        key="b",
+        piece=piece,
+        sound_font_url=sound_font_url,
+    )
+
+    st.subheader("Piece A & B")
+    from_fortepyan(
+        piece=piece,
+        secondary_piece=secondary_piece,
+    )
+
+    st.subheader("Piece B `from_notes_df`")
+    from_notes_df(
+        notes_df=secondary_piece.df,
+    )
 
 
-def make_some_notes(first_note: int, fortepyan_format: bool = False):
-    if fortepyan_format:
-        start_key = "start"
-        end_key = "end"
-    else:
-        start_key = "startTime"
-        end_key = "endTime"
+def make_some_notes(first_note: int) -> list[dict]:
+    start_key = "start"
+    end_key = "end"
 
     notes = []
     for it in range(180):
@@ -36,34 +67,5 @@ def make_some_notes(first_note: int, fortepyan_format: bool = False):
     return notes
 
 
-for jt in range(2):
-    notes = make_some_notes(
-        first_note=50 + np.random.randint(20),
-    )
-    midi_data = {
-        "totalTime": notes[-1]["endTime"],
-        "notes": notes,
-    }
-
-    pianoroll_player(
-        midi_data=midi_data,
-        key=str(jt),
-    )
-    st.markdown("---")
-
-notes_primary = make_some_notes(first_note=60, fortepyan_format=True)
-notes_secondary = make_some_notes(first_note=53, fortepyan_format=True)
-
-piece = MidiPiece(df=pd.DataFrame(notes_primary))
-piece_secondary = MidiPiece(df=pd.DataFrame(notes_secondary))
-
-display_columns = st.columns(3)
-with display_columns[0]:
-    st.write("Piece A")
-    from_fortepyan(piece=piece)
-with display_columns[1]:
-    st.write("Piece B")
-    from_fortepyan(piece=piece_secondary)
-with display_columns[2]:
-    st.write("Piece A & B")
-    from_fortepyan(piece=piece, secondary_piece=piece_secondary)
+if __name__ == "__main__":
+    main()

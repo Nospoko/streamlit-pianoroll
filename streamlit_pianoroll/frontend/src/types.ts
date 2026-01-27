@@ -14,6 +14,7 @@ export interface MidiPlayerElement extends HTMLElement {
   duration: number
   noteSequence?: NoteSequence
   addVisualizer(visualizer: PianoRollSvgVisualizer): void
+  soundFont: string | null
 }
 
 export interface MidiVisualizerElement extends HTMLElement {

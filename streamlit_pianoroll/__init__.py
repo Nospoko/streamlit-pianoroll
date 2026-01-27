@@ -30,7 +30,7 @@ if not _RELEASE:
         # Pass `url` here to tell Streamlit that the component will be served
         # by the local dev server that you run via `npm run start`.
         # (This is useful while your component is in development.)
-        url="http://localhost:3210",
+        url="http://localhost:3000",
     )
 else:
     # When we're distributing a production version of the component, we'll
@@ -48,8 +48,9 @@ else:
 # output value, and add a docstring for users.
 def pianoroll_player(
     midi_data: dict,
-    show_bird_view: bool,
-    key: str = None,
+    show_bird_view: bool = True,
+    sound_font_url: str = None,
+    key: str | None = None,
 ):
     """Create a new instance of "pianoroll".
 
@@ -57,6 +58,10 @@ def pianoroll_player(
     ----------
     midi_data: dict
         MIDI notes in a format that the html player will accept
+    show_bird_view: bool
+        Whether to display the bottom "bird" visualization with full sequence.
+    sound_font_url: str or None
+        If None (default), use soundfonts from API. If url is provided, use soundfonts from url.
     key: str or None
         An optional key that uniquely identifies this component. If this is
         None, and the component's arguments are changed, the component will
@@ -72,7 +77,13 @@ def pianoroll_player(
     #
     # "default" is a special argument that specifies the initial return
     # value of the component before the user has interacted with it.
-    component_value = _component_func(key=key, default=0, midi_data=midi_data, show_bird_view=show_bird_view)
+    component_value = _component_func(
+        key=key,
+        default=0,
+        midi_data=midi_data,
+        show_bird_view=show_bird_view,
+        sound_font_url=sound_font_url,
+    )
 
     # We could modify the value returned from the component if we wanted.
     # There's no need to do this in our simple example - but it's an option.
@@ -81,6 +92,7 @@ def pianoroll_player(
 
 def from_notes_df(
     notes_df: pd.DataFrame,
+    sound_font_url: str = None,
     show_bird_view: bool = True,
     key: str = None,
 ):
@@ -110,6 +122,7 @@ def from_fortepyan(
     piece: MidiPiece,
     secondary_piece: MidiPiece = None,
     show_bird_view: bool = True,
+    sound_font_url: str = None,
     key: str = None,
 ):
     df = piece.df.copy()
@@ -124,6 +137,7 @@ def from_fortepyan(
     component_value = from_notes_df(
         notes_df=df,
         show_bird_view=show_bird_view,
+        sound_font_url=sound_font_url,
         key=key,
     )
 
